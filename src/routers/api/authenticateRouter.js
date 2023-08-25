@@ -6,10 +6,12 @@ const router = express.Router();
 
 // [POST] api/v1/authenticate/login
 router.post("/login", AuthenticateController.handleLogin);
-router.post(
+router.get(
   "/get-profile",
   authorizationToken,
   AuthenticateController.handleGetProfile
 );
+
+router.post("/logout", authorizationToken, AuthenticateController.handleLogout);
 
 export default router;

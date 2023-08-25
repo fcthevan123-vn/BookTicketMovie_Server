@@ -6,6 +6,8 @@ import logger from "morgan";
 import * as dotenv from "dotenv";
 import connectDb from "./config/db";
 import { handleError } from "./middleWares";
+import cors from "cors";
+import cookieParser from "cookie-parser";
 
 dotenv.config();
 
@@ -17,6 +19,16 @@ app.use(logger("dev"));
 // Parse body object from request
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+app.use(
+  cors({
+    origin: ["http://127.0.0.1:5173", "http://localhost:5173"], // chỉ cho phép truy cập từ domain này []
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"], // chỉ cho phép sử dụng các phương thức này
+  })
+);
+
+app.use(cookieParser());
 
 // Connect to database
 connectDb();

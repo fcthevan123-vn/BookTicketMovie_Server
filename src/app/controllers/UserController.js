@@ -31,6 +31,32 @@ class UserController {
         .json({ message: "Error creating user.", err: error.message });
     }
   }
+
+  async handleGetUserById(req, res, next) {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(401).json({
+        statusCode: 1,
+        message: "Missing required fields",
+      });
+    }
+
+    try {
+      const response = await userServices.getUserById({
+        id,
+      });
+      if (response.statusCode === 0) {
+        return res.status(200).json(response);
+      }
+      return res.status(400).json(response);
+    } catch (error) {
+      console.log(error);
+      return res
+        .status(500)
+        .json({ message: "Error handleGetUserById", err: error.message });
+    }
+  }
 }
 
 export default new UserController();

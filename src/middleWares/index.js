@@ -12,17 +12,15 @@ export function handleError(err, req, res, next) {
 
 export function authorizationToken(req, res, next) {
   try {
-    const authorizationToken = req.headers.authorization.split(" ")[1];
-    if (!authorizationToken) {
+    const accessToken = req.cookies.token;
+    console.log("accessToken", accessToken);
+    if (!accessToken) {
       return res.status(400).json({
         message: "Invalid authorization token",
       });
     }
 
-    const tokenJWT = jwt.verify(
-      authorizationToken,
-      process.env.ACCESS_TOKEN_SECRET
-    );
+    const tokenJWT = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
 
     if (!tokenJWT) {
       return res.status(400).json({
@@ -30,10 +28,13 @@ export function authorizationToken(req, res, next) {
       });
     }
 
-    res.tokenJWT = tokenJWT;
+    req.user = {
+      id: tokenJWT.userId,
+    };
 
     next();
   } catch (error) {
+    console.log("error", error);
     return res.status(403).json({
       message: "Error at authorizationToken ",
     });

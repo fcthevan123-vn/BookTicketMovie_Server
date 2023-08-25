@@ -48,9 +48,12 @@ class UserServices {
     }
   }
 
-  async getUserById({ userId }) {
+  async getUserById({ id }) {
     try {
-      const userDoc = await db.User.findByPk(userId);
+      const userDoc = await db.User.findByPk(id, {
+        raw: true,
+        attributes: { exclude: ["password"] },
+      });
       if (!userDoc) {
         return {
           statusCode: 1,
