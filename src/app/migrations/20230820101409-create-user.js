@@ -32,6 +32,13 @@ module.exports = {
       sex: {
         type: Sequelize.INTEGER,
       },
+      age: {
+        type: Sequelize.INTEGER,
+      },
+      type: {
+        type: Sequelize.STRING,
+        defaultValue: "user",
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

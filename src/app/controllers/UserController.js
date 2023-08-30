@@ -2,9 +2,17 @@ import { userServices } from "../../services";
 
 class UserController {
   async handleRegister(req, res, next) {
-    const { fullName, email, phone, password, address, sex } = req.body;
+    const { fullName, email, phone, password, address, sex, age } = req.body;
 
-    if (!fullName || !email || !phone || !password || !address || !sex) {
+    if (
+      !fullName ||
+      !email ||
+      !phone ||
+      !password ||
+      !address ||
+      !sex ||
+      !age
+    ) {
       return res.status(401).json({
         statusCode: 1,
         message: "Missing required fields",
@@ -19,6 +27,7 @@ class UserController {
         password,
         address,
         sex,
+        age,
       });
       if (response.statusCode === 0) {
         return res.status(200).json(response);
@@ -55,6 +64,67 @@ class UserController {
       return res
         .status(500)
         .json({ message: "Error handleGetUserById", err: error.message });
+    }
+  }
+
+  async handleUpdateInfor(req, res, next) {
+    const { id } = req.params;
+    const { fullName, phone, address, sex, age } = req.body;
+
+    if (!id || !fullName || !phone || !address || !sex || !age) {
+      return res.status(401).json({
+        statusCode: 1,
+        message: "Missing required fields",
+      });
+    }
+
+    try {
+      const response = await userServices.updateProfileUser({
+        id,
+        fullName,
+        phone,
+        address,
+        sex,
+        age,
+      });
+      if (response.statusCode === 0) {
+        return res.status(200).json(response);
+      }
+      return res.status(400).json(response);
+    } catch (error) {
+      console.log(error);
+      return res
+        .status(500)
+        .json({ message: "Error handleUpdateInfor", err: error.message });
+    }
+  }
+
+  async handleChangePassword(req, res, next) {
+    const { id } = req.params;
+    const { oldPassword, newPassword } = req.body;
+
+    if (!id || !oldPassword || !newPassword) {
+      return res.status(401).json({
+        statusCode: 1,
+        message: "Missing required fields",
+      });
+    }
+
+    try {
+      const response = await userServices.changePassword({
+        id,
+        oldPassword,
+        newPassword,
+      });
+      if (response.statusCode === 0) {
+        return res.status(200).json(response);
+      }
+      return res.status(400).json(response);
+    } catch (error) {
+      console.log(error);
+      return res
+        .status(500)
+        .json({ message: "Error handleChangePassword", err: error.message });
     }
   }
 }

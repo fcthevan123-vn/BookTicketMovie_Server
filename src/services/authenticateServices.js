@@ -34,7 +34,7 @@ class AuthenticateServices {
       const tokenJWT = jwt.sign(data, process.env.ACCESS_TOKEN_SECRET, {
         expiresIn: "1d",
       });
-      console.log("tokenJWT: ", tokenJWT);
+
       const expiresIn = Math.floor(new Date().getTime() / 1000);
 
       if (!tokenJWT) {
