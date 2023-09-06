@@ -13,9 +13,10 @@ export function handleError(err, req, res, next) {
 export function authorizationToken(req, res, next) {
   try {
     const accessToken = req.cookies.token;
-    console.log("accessToken", accessToken);
+    console.log("accessToken exist", accessToken);
     if (!accessToken) {
       return res.status(400).json({
+        statusCode: 3,
         message: "Invalid authorization token",
       });
     }
@@ -24,6 +25,7 @@ export function authorizationToken(req, res, next) {
 
     if (!tokenJWT) {
       return res.status(400).json({
+        statusCode: 2,
         message: "Something error when create token",
       });
     }
@@ -36,6 +38,7 @@ export function authorizationToken(req, res, next) {
   } catch (error) {
     console.log("error", error);
     return res.status(403).json({
+      statusCode: 1,
       message: "Error at authorizationToken ",
     });
   }

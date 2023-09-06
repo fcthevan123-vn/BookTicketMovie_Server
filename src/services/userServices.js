@@ -125,8 +125,6 @@ class UserServices {
         userData.password
       );
 
-      console.log("isComparePassword", isComparePassword);
-
       if (!isComparePassword) {
         return {
           statusCode: 1,

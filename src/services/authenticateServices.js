@@ -10,7 +10,7 @@ class AuthenticateServices {
       if (!userExisted) {
         return {
           statusCode: 1,
-          message: "User does not exist",
+          message: "Tài khoản hoặc mật khẩu không chính xác",
         };
       }
 
@@ -21,7 +21,7 @@ class AuthenticateServices {
       if (!passwordCheck) {
         return {
           statusCode: 2,
-          message: "Password does not match",
+          message: "Tài khoản hoặc mật khẩu không chính xác ",
         };
       }
 
@@ -40,20 +40,20 @@ class AuthenticateServices {
       if (!tokenJWT) {
         return {
           statusCode: 3,
-          message: "Create token failure",
+          message: "Tạo token lỗi",
         };
       }
 
       return {
         statusCode: 0,
-        message: "Login successfully",
+        message: "Đăng nhập thành công",
         token: tokenJWT,
         expiresIn,
       };
     } catch (error) {
       return {
         statusCode: 4,
-        message: "Error at login",
+        message: "Có lỗi xảy ra tại Login!",
       };
     }
   }

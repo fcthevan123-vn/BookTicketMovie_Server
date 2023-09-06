@@ -17,8 +17,22 @@ class AuthenticateController {
         password,
       });
 
-      console.log("response", response);
-
+      // console.log("response", response);
+      if (response.statusCode === 0) {
+        return res
+          .cookie("token", response.token, {
+            sameSite: "strict",
+            secure: false,
+            httpOnly: true,
+            path: "/",
+            expiresIn: response.expiresIn,
+          })
+          .status(200)
+          .json({
+            statusCode: response.statusCode,
+            message: response.message,
+          });
+      }
       return res
         .cookie("token", response.token, {
           sameSite: "strict",
@@ -27,7 +41,7 @@ class AuthenticateController {
           path: "/",
           expiresIn: response.expiresIn,
         })
-        .status(200)
+        .status(400)
         .json({
           statusCode: response.statusCode,
           message: response.message,
