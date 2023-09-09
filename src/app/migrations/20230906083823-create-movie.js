@@ -15,11 +15,11 @@ module.exports = {
       description: {
         type: Sequelize.STRING,
       },
-      director: {
-        type: Sequelize.STRING,
+      directors: {
+        type: Sequelize.ARRAY(Sequelize.STRING),
       },
       actors: {
-        type: Sequelize.STRING,
+        type: Sequelize.ARRAY(Sequelize.STRING),
       },
       language: {
         type: Sequelize.STRING,
@@ -30,23 +30,27 @@ module.exports = {
       subtitle: {
         type: Sequelize.STRING,
       },
-      dubbing: {
-        type: Sequelize.STRING,
-      },
       releaseDate: {
         type: Sequelize.DATE,
       },
-      image: {
+      endDate: {
         type: Sequelize.DATE,
+      },
+      images: {
+        type: Sequelize.ARRAY(Sequelize.STRING),
       },
       genre: {
-        type: Sequelize.STRING,
+        type: Sequelize.ARRAY(Sequelize.STRING),
       },
       duration: {
-        type: Sequelize.DATE,
+        type: Sequelize.INTEGER,
       },
       ageRequire: {
-        type: Sequelize.NUMBER,
+        type: Sequelize.INTEGER,
+      },
+      countBooked: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,
       },
       createdAt: {
         allowNull: false,

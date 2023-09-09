@@ -1,4 +1,6 @@
 import jwt from "jsonwebtoken";
+import multer from "multer";
+
 // error handler
 export function handleError(err, req, res, next) {
   // set locals, only providing error in development
@@ -10,23 +12,23 @@ export function handleError(err, req, res, next) {
   res.render("error");
 }
 
+// Check cookies
 export function authorizationToken(req, res, next) {
   try {
     const accessToken = req.cookies.token;
-    console.log("accessToken exist", accessToken);
     if (!accessToken) {
       return res.status(400).json({
         statusCode: 3,
-        message: "Invalid authorization token",
+        message: "Token không hợp lệ",
       });
     }
 
     const tokenJWT = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
-
+    console.log("tokenJWT", tokenJWT);
     if (!tokenJWT) {
       return res.status(400).json({
         statusCode: 2,
-        message: "Something error when create token",
+        message: "Đã có lỗi khi tạo token",
       });
     }
 
@@ -39,7 +41,54 @@ export function authorizationToken(req, res, next) {
     console.log("error", error);
     return res.status(403).json({
       statusCode: 1,
-      message: "Error at authorizationToken ",
+      message: "Đã có lỗi xảy ra tại authorizationToken ",
     });
   }
 }
+
+export function authorizationAdmin(req, res, next) {
+  try {
+    const accessToken = req.cookies.token;
+
+    if (!accessToken) {
+      return res.status(400).json({
+        statusCode: 3,
+        message: "Token không hợp lệ",
+      });
+    }
+
+    const tokenJWT = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
+
+    if (!tokenJWT) {
+      return res.status(400).json({
+        statusCode: 2,
+        message: "Đã có lỗi khi tạo token",
+      });
+    }
+
+    if (tokenJWT.type != "admin") {
+      return res.status(400).json({
+        statusCode: 2,
+        message: "Bạn không phải là admin",
+      });
+    }
+
+    req.user = {
+      id: tokenJWT.userId,
+    };
+
+    next();
+  } catch (error) {
+    console.log("error", error);
+    return res.status(403).json({
+      statusCode: 1,
+      message: "Đã có lỗi xảy ra tại authorizationAdmin ",
+    });
+  }
+}
+
+// multer
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
+export default upload;

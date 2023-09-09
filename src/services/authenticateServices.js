@@ -29,6 +29,7 @@ class AuthenticateServices {
       const data = {
         email: userExisted.email,
         userId: userExisted.id,
+        type: userExisted.type,
       };
 
       const tokenJWT = jwt.sign(data, process.env.ACCESS_TOKEN_SECRET, {
