@@ -14,6 +14,7 @@ class MovieController {
       country,
       subtitle,
       directors,
+      price,
       actors,
       genre,
     } = req.body;
@@ -28,6 +29,7 @@ class MovieController {
       !duration ||
       !language ||
       !country ||
+      !price ||
       !subtitle ||
       !directors ||
       !actors ||
@@ -61,6 +63,7 @@ class MovieController {
         ageRequire,
         releaseDate,
         endDate,
+        price,
         duration,
         language,
         country,
@@ -81,6 +84,78 @@ class MovieController {
       return res.status(500).json({
         statusCode: 1,
         message: "Có lỗi xảy ra tại handleCreateMovie",
+      });
+    }
+  }
+
+  async handleGetAllMovies(req, res, next) {
+    try {
+      const { isCount } = req.query;
+      const response = await movieServices.getAllMovies({ isCount });
+      if (response.statusCode === 0) {
+        return res.status(200).json(response);
+      } else {
+        return res.status(400).json(response);
+      }
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        statusCode: 1,
+        message: "Có lỗi xảy ra tại handleGetAllMovies",
+      });
+    }
+  }
+
+  async handleGetLimitMovies(req, res, next) {
+    const { page, limit } = req.query;
+
+    if (!page && !limit) {
+      return res.status(401).json({
+        statusCode: 1,
+        message: "Nhập thiếu dữ liệu ",
+      });
+    }
+    try {
+      const response = await movieServices.getLimitMovies({ page, limit });
+      if (response.statusCode === 0) {
+        return res.status(200).json(response);
+      } else {
+        return res.status(400).json(response);
+      }
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        statusCode: 2,
+        message: "Có lỗi xảy ra tại handleGetLimitMovies",
+      });
+    }
+  }
+
+  async handleSearchMovieByTile(req, res, next) {
+    const { title, page, limit } = req.query;
+
+    if (!title && !page && !limit) {
+      return res.status(401).json({
+        statusCode: 1,
+        message: "Nhập thiếu dữ liệu ",
+      });
+    }
+    try {
+      const response = await movieServices.searchMovieByTitle({
+        title,
+        page,
+        limit,
+      });
+      if (response.statusCode === 0) {
+        return res.status(200).json(response);
+      } else {
+        return res.status(400).json(response);
+      }
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        statusCode: 2,
+        message: "Có lỗi xảy ra tại handleSearchMovieByTile",
       });
     }
   }

@@ -1,5 +1,7 @@
 import db from "../app/models";
 import moment from "moment";
+const { Op } = require("sequelize");
+
 class movieServices {
   async createMovie({
     title,
@@ -8,6 +10,7 @@ class movieServices {
     releaseDate,
     endDate,
     duration,
+    price,
     language,
     country,
     subtitle,
@@ -34,6 +37,7 @@ class movieServices {
         language,
         country,
         subtitle,
+        price,
         directors,
         actors,
         genre,
@@ -82,7 +86,79 @@ class movieServices {
     }
   }
 
-  async getTrendingMovie() {}
+  async getAllMovies({ isCount }) {
+    try {
+      let movieDoc;
+      if (isCount) {
+        movieDoc = await db.Movie.count();
+      } else {
+        movieDoc = await db.Movie.findAll();
+      }
+      if (movieDoc) {
+        return {
+          statusCode: 0,
+          message: "Lấy dữ liệu thành công",
+          data: movieDoc,
+        };
+      }
+    } catch (error) {
+      return {
+        statusCode: 1,
+        message: "Đã có lỗi xảy ra khi getAllMovie",
+      };
+    }
+  }
+
+  async getLimitMovies({ page, limit }) {
+    try {
+      const { count, rows: movieDoc } = await db.Movie.findAndCountAll({
+        offset: (page - 1) * limit,
+        limit: limit,
+        order: [["createdAt", "ASC"]],
+      });
+      if (movieDoc) {
+        return {
+          statusCode: 0,
+          message: "Lấy dữ liệu thành công",
+          data: movieDoc,
+          rows: count,
+        };
+      }
+    } catch (error) {
+      return {
+        statusCode: 1,
+        message: "Đã có lỗi xảy ra khi getAllMovie",
+      };
+    }
+  }
+  async searchMovieByTitle({ title, page, limit }) {
+    try {
+      const { count, rows: movieDoc } = await db.Movie.findAndCountAll({
+        offset: (page - 1) * limit,
+        limit: limit,
+        order: [["createdAt", "ASC"]],
+        where: {
+          title: {
+            [Op.iLike]: `%${title}%`,
+          },
+        },
+      });
+      if (movieDoc) {
+        return {
+          statusCode: 0,
+          message: "Lấy dữ liệu thành công",
+          data: movieDoc,
+          rows: count,
+        };
+      }
+    } catch (error) {
+      console.log(error);
+      return {
+        statusCode: 1,
+        message: "Đã có lỗi xảy ra khi searchMovieByTitle",
+      };
+    }
+  }
 }
 
 export default new movieServices();

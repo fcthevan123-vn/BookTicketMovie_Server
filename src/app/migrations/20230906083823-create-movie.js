@@ -13,7 +13,7 @@ module.exports = {
         type: Sequelize.STRING,
       },
       description: {
-        type: Sequelize.STRING,
+        type: Sequelize.TEXT,
       },
       directors: {
         type: Sequelize.ARRAY(Sequelize.STRING),
@@ -37,7 +37,7 @@ module.exports = {
         type: Sequelize.DATE,
       },
       images: {
-        type: Sequelize.ARRAY(Sequelize.STRING),
+        type: Sequelize.ARRAY(Sequelize.JSONB),
       },
       genre: {
         type: Sequelize.ARRAY(Sequelize.STRING),
@@ -46,6 +46,9 @@ module.exports = {
         type: Sequelize.INTEGER,
       },
       ageRequire: {
+        type: Sequelize.INTEGER,
+      },
+      price: {
         type: Sequelize.INTEGER,
       },
       countBooked: {
