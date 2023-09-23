@@ -1,7 +1,7 @@
 import { s3Services } from "../../services";
 import crypto from "crypto";
 import sharp from "sharp";
-import { uploadFile } from "../../services/s3Services";
+import { deleteFile, uploadFile } from "../../services/s3Services";
 
 function generateFileName(bytes) {
   return crypto.randomBytes(bytes).toString("hex");
@@ -34,6 +34,24 @@ class S3Controller {
       return {
         statusCode: 1,
         message: "Xảy ra lỗi trong quá trình tải lên hình ảnh",
+      };
+    }
+  }
+
+  async handleDelteImages(imgUrls) {
+    try {
+      for (let url of imgUrls) {
+        await deleteFile(url);
+      }
+
+      return {
+        statusCode: 0,
+        message: "Xoá hình ảnh thành công",
+      };
+    } catch (error) {
+      return {
+        statusCode: 1,
+        message: "Xảy ra lỗi trong quá trình xoá hình ảnh",
       };
     }
   }

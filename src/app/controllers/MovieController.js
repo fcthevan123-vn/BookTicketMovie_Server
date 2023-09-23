@@ -1,3 +1,4 @@
+import { validationResult } from "express-validator";
 import { movieServices } from "../../services";
 import S3Controller from "./S3Controller";
 
@@ -20,24 +21,12 @@ class MovieController {
     } = req.body;
     const files = req.files;
 
-    if (
-      !title ||
-      !description ||
-      !ageRequire ||
-      !releaseDate ||
-      !endDate ||
-      !duration ||
-      !language ||
-      !country ||
-      !price ||
-      !subtitle ||
-      !directors ||
-      !actors ||
-      !genre
-    ) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
       return res.status(401).json({
         statusCode: 1,
-        message: "Nhập thiếu dữ liệu ",
+        message: "Dữ liệu đầu vào không hợp lệ",
+        errors: errors.array(),
       });
     }
 
@@ -107,12 +96,14 @@ class MovieController {
   }
 
   async handleGetLimitMovies(req, res, next) {
+    const errors = validationResult(req);
     const { page, limit } = req.query;
 
-    if (!page && !limit) {
+    if (!errors.isEmpty()) {
       return res.status(401).json({
         statusCode: 1,
-        message: "Nhập thiếu dữ liệu ",
+        message: "Dữ liệu đầu vào không hợp lệ",
+        errors: errors.array(),
       });
     }
     try {
@@ -156,6 +147,82 @@ class MovieController {
       return res.status(500).json({
         statusCode: 2,
         message: "Có lỗi xảy ra tại handleSearchMovieByTile",
+      });
+    }
+  }
+
+  async handleEditMovie(req, res, next) {
+    const {
+      title,
+      description,
+      ageRequire,
+      releaseDate,
+      endDate,
+      duration,
+      language,
+      country,
+      subtitle,
+      directors,
+      price,
+      actors,
+      genre,
+      imagesDelete,
+    } = req.body;
+    const files = req.files;
+    const { id } = req.params;
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      return res.status(401).json({
+        statusCode: 1,
+        message: "Dữ liệu đầu vào không hợp lệ",
+        errors: errors.array(),
+      });
+    }
+
+    try {
+      let imageData = [];
+      if (files.length > 0) {
+        const imgUpload = await S3Controller.handleUploadImages(files);
+        if (imgUpload.statusCode === 0) {
+          imageData = imgUpload.data;
+        } else {
+          return imgUpload;
+        }
+      }
+
+      const response = await movieServices.editMovie({
+        id,
+        title,
+        description,
+        ageRequire,
+        releaseDate,
+        endDate,
+        price,
+        duration,
+        language,
+        country,
+        subtitle,
+        directors,
+        actors,
+        genre,
+        imageData,
+        imagesDelete,
+      });
+
+      if (response.statusCode === 0) {
+        if (imagesDelete && imagesDelete.length > 0) {
+          await S3Controller.handleDelteImages(imagesDelete);
+        }
+        return res.status(200).json(response);
+      } else {
+        return res.status(401).json(response);
+      }
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        statusCode: 1,
+        message: "Có lỗi xảy ra tại handleEditMovie",
       });
     }
   }

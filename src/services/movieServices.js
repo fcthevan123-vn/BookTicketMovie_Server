@@ -1,5 +1,4 @@
 import db from "../app/models";
-import moment from "moment";
 const { Op } = require("sequelize");
 
 class movieServices {
@@ -156,6 +155,88 @@ class movieServices {
       return {
         statusCode: 1,
         message: "Đã có lỗi xảy ra khi searchMovieByTitle",
+      };
+    }
+  }
+
+  async editMovie({
+    id,
+    title,
+    description,
+    ageRequire,
+    releaseDate,
+    endDate,
+    duration,
+    price,
+    language,
+    country,
+    subtitle,
+    directors,
+    actors,
+    genre,
+    imageData,
+    imagesDelete,
+  }) {
+    try {
+      const movieExisted = await db.Movie.findOne({ where: { id } });
+      if (!movieExisted)
+        return {
+          statusCode: 2,
+          message: "Phim này không tồn tại",
+        };
+
+      let imageMerge;
+
+      if (imagesDelete) {
+        imageMerge = movieExisted.images.filter(
+          (image) => !imagesDelete.includes(image.imageName)
+        );
+      } else {
+        imageMerge = movieExisted.images;
+      }
+
+      const movieDoc = await db.Movie.update(
+        {
+          title,
+          description,
+          ageRequire,
+          releaseDate,
+          endDate,
+          duration,
+          language,
+          country,
+          subtitle,
+          price,
+          directors,
+          actors,
+          genre,
+          images: [...imageMerge, ...imageData],
+          countBooked: 0,
+        },
+        {
+          where: {
+            id: id,
+          },
+        }
+      );
+
+      if (movieDoc) {
+        return {
+          statusCode: 0,
+          message: "Sửa phim thành công",
+          data: movieDoc,
+        };
+      } else {
+        return {
+          statusCode: 1,
+          message: "Sửa phim thất bại",
+        };
+      }
+    } catch (error) {
+      console.log(error);
+      return {
+        statusCode: 3,
+        message: "Đã có lỗi xảy ra khi sửa phim",
       };
     }
   }

@@ -1,6 +1,10 @@
 import express from "express";
 import { MovieController } from "../../app/controllers";
 import upload, { authorizationAdmin } from "../../middleWares";
+import {
+  validateCreateMovie,
+  validateInputMovie,
+} from "../../middleWares/validates/movieValidate";
 
 const router = express.Router();
 
@@ -9,7 +13,17 @@ router.post(
   "/create",
   authorizationAdmin,
   upload.array("images", 6),
+  validateCreateMovie,
   MovieController.handleCreateMovie
+);
+
+// [PATCH] api/v1/movie/edit/:id
+router.patch(
+  "/edit/:id",
+  authorizationAdmin,
+  upload.array("images", 6),
+  validateCreateMovie,
+  MovieController.handleEditMovie
 );
 
 // [GET] api/v1/movie/all-movies?isCount=
@@ -23,6 +37,7 @@ router.get(
 router.get(
   "/all-limit-movies",
   authorizationAdmin,
+  validateInputMovie,
   MovieController.handleGetLimitMovies
 );
 
