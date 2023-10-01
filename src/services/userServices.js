@@ -11,7 +11,7 @@ class UserServices {
       if (emailExisted)
         return {
           statusCode: 2,
-          message: "Email already exists.",
+          message: "Email đã tồn tại",
         };
 
       const passwordHash = await bcrypt.hash(password, saltRounds);
@@ -34,13 +34,13 @@ class UserServices {
       if (userDoc) {
         return {
           statusCode: 0,
-          message: "Register user successfully.",
+          message: "Đăng ký tài khoản thành công",
           user: userDoc,
         };
       } else {
         return {
           statusCode: 4,
-          message: "Register user failed.",
+          message: "Đăng ký tài khoản thất bại",
         };
       }
     } catch (error) {
@@ -77,39 +77,86 @@ class UserServices {
     }
   }
 
-  async updateProfileUser({ id, fullName, phone, address, sex, age }) {
+  async getAllUserByRule({ page, limit }) {
     try {
-      const userDoc = await db.User.update(
-        {
-          fullName,
-          phone,
-          address,
-          sex,
-          age,
-        },
-        {
-          where: {
-            id: id,
-          },
-        }
-      );
-
+      const { count, rows: userDoc } = await db.User.findAndCountAll({
+        offset: (page - 1) * limit,
+        limit: limit,
+        order: [["createdAt", "ASC"]],
+      });
       if (!userDoc) {
         return {
           statusCode: 1,
-          message: "User does not exist",
+          message: "Có lỗi xảy ra",
         };
       }
 
       return {
         statusCode: 0,
-        message: "Update successfully",
+        message: "Get user thành công",
+        data: userDoc,
+        rows: count,
+      };
+    } catch (error) {
+      return {
+        statusCode: 2,
+        message: "Có lỗi xảy ra tại getAllUserByRule",
+      };
+    }
+  }
+
+  async updateProfileUser({ id, fullName, phone, address, sex, age, email }) {
+    try {
+      let userDoc;
+      if (email.length > 0) {
+        userDoc = await db.User.update(
+          {
+            fullName,
+            phone,
+            address,
+            sex,
+            age,
+            email,
+          },
+          {
+            where: {
+              id: id,
+            },
+          }
+        );
+      } else {
+        userDoc = await db.User.update(
+          {
+            fullName,
+            phone,
+            address,
+            sex,
+            age,
+          },
+          {
+            where: {
+              id: id,
+            },
+          }
+        );
+      }
+
+      if (!userDoc) {
+        return {
+          statusCode: 1,
+          message: "Người dùng không tồn tại",
+        };
+      }
+
+      return {
+        statusCode: 0,
+        message: "Cập nhật người dùng thành công",
         data: userDoc,
       };
     } catch (error) {
       return {
         statusCode: 2,
-        message: "Something went wrong at updateProfileUser",
+        message: "Có lỗi xảy ra tại updateProfileUser",
       };
     }
   }

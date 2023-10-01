@@ -1,3 +1,4 @@
+import S3Controller from "../app/controllers/S3Controller";
 import db from "../app/models";
 const { Op } = require("sequelize");
 
@@ -237,6 +238,37 @@ class movieServices {
       return {
         statusCode: 3,
         message: "Đã có lỗi xảy ra khi sửa phim",
+      };
+    }
+  }
+
+  async deleteMovie({ id }) {
+    try {
+      const movieExisted = await db.Movie.findOne({ where: { id } });
+      if (!movieExisted) {
+        return {
+          statusCode: 1,
+          message: "Phim này không tồn tại",
+        };
+      }
+
+      let imagesToDelete = [];
+      if (movieExisted.images.length > 0) {
+        imagesToDelete = movieExisted.images.map((img) => img.imageName);
+      }
+
+      await movieExisted.destroy();
+
+      await S3Controller.handleDelteImages(imagesToDelete);
+      return {
+        statusCode: 0,
+        message: "Xoá phim thành công",
+      };
+    } catch (error) {
+      console.error(error);
+      return {
+        statusCode: 1,
+        message: "Đã có lỗi xảy ra khi deleteMovie",
       };
     }
   }

@@ -17,6 +17,13 @@ router.post(
   MovieController.handleCreateMovie
 );
 
+// [POST] api/v1/movie/delete/:id
+router.delete(
+  "/delete/:id",
+  authorizationAdmin,
+  MovieController.handleDeleteMovie
+);
+
 // [PATCH] api/v1/movie/edit/:id
 router.patch(
   "/edit/:id",

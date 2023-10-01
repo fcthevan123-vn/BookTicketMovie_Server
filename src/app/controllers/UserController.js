@@ -32,7 +32,7 @@ class UserController {
       if (response.statusCode === 0) {
         return res.status(200).json(response);
       }
-      return res.status(400).json(response);
+      return res.status(401).json(response);
     } catch (error) {
       console.log(error);
       return res
@@ -67,9 +67,38 @@ class UserController {
     }
   }
 
+  async handleGetAllUserByAdmin(req, res, next) {
+    const { page, limit } = req.query;
+    if (!page || !limit) {
+      return res.status(401).json({
+        statusCode: 1,
+        message: "Nhập thiếu dữ liệu",
+      });
+    }
+    try {
+      const response = await userServices.getAllUserByRule({ page, limit });
+      if (response.statusCode === 0) {
+        return res.status(200).json(response);
+      }
+      return res.status(400).json(response);
+    } catch (error) {
+      console.log(error);
+      return res
+        .status(500)
+        .json({ message: "Error handleGetUserById", err: error.message });
+    }
+  }
+
   async handleUpdateInfor(req, res, next) {
     const { id } = req.params;
+    const { isAdmin } = req.query;
     const { fullName, phone, address, sex, age } = req.body;
+
+    let email = "";
+
+    if (isAdmin) {
+      email = req.body;
+    }
 
     if (!id || !fullName || !phone || !address || !sex || !age) {
       return res.status(401).json({
@@ -86,6 +115,7 @@ class UserController {
         address,
         sex,
         age,
+        email,
       });
       if (response.statusCode === 0) {
         return res.status(200).json(response);
