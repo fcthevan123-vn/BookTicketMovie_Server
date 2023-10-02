@@ -1,8 +1,15 @@
 import { userServices } from "../../services";
 
 class UserController {
-  async handleRegister(req, res, next) {
+  async handleRegister(req, res) {
     const { fullName, email, phone, password, address, sex, age } = req.body;
+    const { isAdmin } = req.query;
+
+    let type;
+
+    if (isAdmin) {
+      type = req.body.type;
+    }
 
     if (
       !fullName ||
@@ -28,6 +35,7 @@ class UserController {
         address,
         sex,
         age,
+        type,
       });
       if (response.statusCode === 0) {
         return res.status(200).json(response);
@@ -41,7 +49,7 @@ class UserController {
     }
   }
 
-  async handleGetUserById(req, res, next) {
+  async handleGetUserById(req, res) {
     const { id } = req.params;
 
     if (!id) {
@@ -67,7 +75,7 @@ class UserController {
     }
   }
 
-  async handleGetAllUserByAdmin(req, res, next) {
+  async handleGetAllUserByAdmin(req, res) {
     const { page, limit } = req.query;
     if (!page || !limit) {
       return res.status(401).json({
@@ -89,15 +97,39 @@ class UserController {
     }
   }
 
-  async handleUpdateInfor(req, res, next) {
+  async handleDeleteUser(req, res) {
+    const { id } = req.params;
+    if (!id) {
+      return res.status(401).json({
+        statusCode: 1,
+        message: "Nhập thiếu id",
+      });
+    }
+    try {
+      const response = await userServices.deleteUserById({ id });
+      if (response.statusCode === 0) {
+        return res.status(200).json(response);
+      }
+      return res.status(400).json(response);
+    } catch (error) {
+      console.log(error);
+      return res
+        .status(500)
+        .json({ message: "Error handleGetUserById", err: error.message });
+    }
+  }
+
+  async handleUpdateInfor(req, res) {
     const { id } = req.params;
     const { isAdmin } = req.query;
     const { fullName, phone, address, sex, age } = req.body;
 
     let email = "";
+    let type = "";
 
     if (isAdmin) {
-      email = req.body;
+      email = req.body.email;
+      type = req.body.type;
     }
 
     if (!id || !fullName || !phone || !address || !sex || !age) {
@@ -116,6 +148,7 @@ class UserController {
         sex,
         age,
         email,
+        type,
       });
       if (response.statusCode === 0) {
         return res.status(200).json(response);
@@ -129,7 +162,7 @@ class UserController {
     }
   }
 
-  async handleChangePassword(req, res, next) {
+  async handleChangePassword(req, res) {
     const { id } = req.params;
     const { oldPassword, newPassword } = req.body;
 

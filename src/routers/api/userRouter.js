@@ -4,6 +4,20 @@ import { authorizationAdmin, authorizationToken } from "../../middleWares";
 
 const router = express.Router();
 
+// [POST] api/v1/user/register-by-admin?isAdmin
+router.post(
+  "/register-by-admin",
+  authorizationAdmin,
+  UserController.handleRegister
+);
+
+// [DELETE] api/v1/user/delete/:id
+router.delete(
+  "/delete/:id",
+  authorizationAdmin,
+  UserController.handleDeleteUser
+);
+
 // [POST] api/v1/user/register
 router.post("/register", UserController.handleRegister);
 

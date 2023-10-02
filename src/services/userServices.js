@@ -5,7 +5,16 @@ const saltRounds = 10;
 const salt = bcrypt.genSaltSync(saltRounds);
 
 class UserServices {
-  async createUser({ fullName, email, phone, password, address, sex, age }) {
+  async createUser({
+    fullName,
+    email,
+    phone,
+    password,
+    address,
+    sex,
+    age,
+    type,
+  }) {
     try {
       const emailExisted = await db.User.findOne({ where: { email } });
       if (emailExisted)
@@ -21,15 +30,31 @@ class UserServices {
           message: "Hash password failed.",
         };
       }
-      const userDoc = await db.User.create({
-        fullName,
-        email,
-        password: passwordHash,
-        phone,
-        address,
-        sex,
-        age,
-      });
+
+      let userDoc;
+
+      if (type.length > 0) {
+        userDoc = await db.User.create({
+          fullName,
+          email,
+          password: passwordHash,
+          phone,
+          address,
+          sex,
+          age,
+          type,
+        });
+      } else {
+        userDoc = await db.User.create({
+          fullName,
+          email,
+          password: passwordHash,
+          phone,
+          address,
+          sex,
+          age,
+        });
+      }
 
       if (userDoc) {
         return {
@@ -46,7 +71,7 @@ class UserServices {
     } catch (error) {
       return {
         statusCode: 5,
-        message: "Something went wrong at create user",
+        message: "Có lỗi xảy ra tại createUser",
       };
     }
   }
@@ -73,6 +98,33 @@ class UserServices {
       return {
         statusCode: 2,
         message: "Something went wrong at getUserById",
+      };
+    }
+  }
+
+  async deleteUserById({ id }) {
+    try {
+      const userExisted = await db.User.findOne({ where: { id } });
+      if (!userExisted) {
+        return {
+          statusCode: 1,
+          message: "Người dùng không tồn tại",
+        };
+      }
+
+      await db.User.destroy({
+        where: { id: id },
+      });
+
+      return {
+        statusCode: 0,
+        message: "Xoá tài khoản thành công",
+        data: userExisted,
+      };
+    } catch (error) {
+      return {
+        statusCode: 2,
+        message: "Có lỗi xảy ra khi deleteUserById",
       };
     }
   }
@@ -105,7 +157,16 @@ class UserServices {
     }
   }
 
-  async updateProfileUser({ id, fullName, phone, address, sex, age, email }) {
+  async updateProfileUser({
+    id,
+    fullName,
+    phone,
+    address,
+    sex,
+    age,
+    email,
+    type,
+  }) {
     try {
       let userDoc;
       if (email.length > 0) {
@@ -117,6 +178,7 @@ class UserServices {
             sex,
             age,
             email,
+            type,
           },
           {
             where: {
@@ -154,6 +216,7 @@ class UserServices {
         data: userDoc,
       };
     } catch (error) {
+      console.log(error);
       return {
         statusCode: 2,
         message: "Có lỗi xảy ra tại updateProfileUser",
