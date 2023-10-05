@@ -190,6 +190,29 @@ class UserController {
         .json({ message: "Error handleChangePassword", err: error.message });
     }
   }
+
+  async handleSearchUser(req, res) {
+    const { name, page, limit } = req.query;
+    if (!name && !page && !limit) {
+      return res.status(401).json({
+        statusCode: 1,
+        message: "Nhập thiếu dữ liệu ",
+      });
+    }
+
+    try {
+      const response = await userServices.searchUser({ name, page, limit });
+      if (response.statusCode === 0) {
+        return res.status(200).json(response);
+      }
+      return res.status(400).json(response);
+    } catch (error) {
+      console.log(error);
+      return res
+        .status(500)
+        .json({ message: "Error handleChangePassword", err: error.message });
+    }
+  }
 }
 
 export default new UserController();

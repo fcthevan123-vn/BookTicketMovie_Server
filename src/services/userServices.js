@@ -1,5 +1,6 @@
 import db from "../app/models";
 import bcrypt from "bcrypt";
+const { Op } = require("sequelize");
 
 const saltRounds = 10;
 const salt = bcrypt.genSaltSync(saltRounds);
@@ -273,6 +274,41 @@ class UserServices {
       return {
         statusCode: 2,
         message: "Something went wrong at changePassword",
+      };
+    }
+  }
+
+  async searchUser({ name, page, limit }) {
+    try {
+      const { count, rows: userDoc } = await db.User.findAndCountAll({
+        offset: (page - 1) * limit,
+        limit: limit,
+        order: [["createdAt", "ASC"]],
+        where: {
+          fullName: {
+            [Op.iLike]: `%${name}%`,
+          },
+        },
+      });
+
+      if (!userDoc) {
+        return {
+          statusCode: 1,
+          message: "Không tìm thấy người dùng phù hợp",
+        };
+      }
+
+      return {
+        statusCode: 0,
+        message: "Tìm thấy người dùng phù hợp",
+        data: userDoc,
+        rows: count,
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        statusCode: 2,
+        message: "Có lỗi xảy ra khi tìm kiếm người dùng",
       };
     }
   }

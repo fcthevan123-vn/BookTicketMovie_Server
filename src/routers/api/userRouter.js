@@ -54,4 +54,12 @@ router.patch(
   UserController.handleChangePassword
 );
 
+// [GET] api/v1/user/search-by-admin?name=&page=&limit=
+router.get(
+  "/search-by-admin",
+  authorizationToken,
+  authorizationAdmin,
+  UserController.handleSearchUser
+);
+
 export default router;
