@@ -1,5 +1,6 @@
 import db from "../app/models";
 import bcrypt from "bcrypt";
+// eslint-disable-next-line no-undef
 const { Op } = require("sequelize");
 
 const saltRounds = 10;
@@ -285,9 +286,23 @@ class UserServices {
         limit: limit,
         order: [["createdAt", "ASC"]],
         where: {
-          fullName: {
-            [Op.iLike]: `%${name}%`,
-          },
+          [Op.or]: [
+            {
+              fullName: {
+                [Op.iLike]: `%${name}%`,
+              },
+            },
+            {
+              email: {
+                [Op.iLike]: `%${name}%`,
+              },
+            },
+            {
+              address: {
+                [Op.iLike]: `%${name}%`,
+              },
+            },
+          ],
         },
       });
 

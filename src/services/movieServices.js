@@ -1,5 +1,6 @@
 import S3Controller from "../app/controllers/S3Controller";
 import db from "../app/models";
+// eslint-disable-next-line no-undef
 const { Op } = require("sequelize");
 
 class movieServices {
@@ -269,6 +270,108 @@ class movieServices {
       return {
         statusCode: 1,
         message: "Đã có lỗi xảy ra khi deleteMovie",
+      };
+    }
+  }
+
+  async getTrendingMovie() {
+    try {
+      const trendingMovie = await db.Movie.findAll({
+        where: {
+          [Op.and]: {
+            endDate: {
+              [Op.gte]: new Date(),
+            },
+            releaseDate: {
+              [Op.lte]: new Date(),
+            },
+          },
+        },
+        order: [["countBooked", "DESC"]],
+        limit: 5,
+      });
+      if (!trendingMovie) {
+        return {
+          statusCode: 1,
+          message: "Phim rỗng",
+        };
+      }
+
+      return {
+        statusCode: 0,
+        message: "Lấy danh sách phim thành công",
+        data: trendingMovie,
+      };
+    } catch (error) {
+      console.error(error);
+      return {
+        statusCode: 1,
+        message: "Đã có lỗi xảy ra khi getTrendingMovie",
+      };
+    }
+  }
+
+  async getActiveMovies() {
+    try {
+      const activeMovies = await db.Movie.findAll({
+        where: {
+          [Op.and]: {
+            endDate: {
+              [Op.gte]: new Date(),
+            },
+            releaseDate: {
+              [Op.lte]: new Date(),
+            },
+          },
+        },
+      });
+      if (!activeMovies) {
+        return {
+          statusCode: 1,
+          message: "Phim rỗng",
+        };
+      }
+
+      return {
+        statusCode: 0,
+        message: "Lấy danh sách phim thành công",
+        data: activeMovies,
+      };
+    } catch (error) {
+      console.error(error);
+      return {
+        statusCode: 1,
+        message: "Đã có lỗi xảy ra khi getActiveMovies",
+      };
+    }
+  }
+
+  async getNextMovies() {
+    try {
+      const nextMovies = await db.Movie.findAll({
+        where: {
+          releaseDate: {
+            [Op.gt]: new Date(),
+          },
+        },
+      });
+      if (!nextMovies) {
+        return {
+          statusCode: 1,
+          message: "Phim rỗng",
+        };
+      }
+
+      return {
+        statusCode: 0,
+        message: "Lấy danh sách phim thành công",
+        data: nextMovies,
+      };
+    } catch (error) {
+      console.error(error);
+      return {
+        statusCode: 1,
+        message: "Đã có lỗi xảy ra khi getNextMovies",
       };
     }
   }

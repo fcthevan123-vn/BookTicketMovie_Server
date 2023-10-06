@@ -3,7 +3,7 @@ import { movieServices } from "../../services";
 import S3Controller from "./S3Controller";
 
 class MovieController {
-  async handleCreateMovie(req, res, next) {
+  async handleCreateMovie(req, res) {
     const {
       title,
       description,
@@ -77,7 +77,7 @@ class MovieController {
     }
   }
 
-  async handleGetAllMovies(req, res, next) {
+  async handleGetAllMovies(req, res) {
     try {
       const { isCount } = req.query;
       const response = await movieServices.getAllMovies({ isCount });
@@ -95,7 +95,7 @@ class MovieController {
     }
   }
 
-  async handleGetLimitMovies(req, res, next) {
+  async handleGetLimitMovies(req, res) {
     const errors = validationResult(req);
     const { page, limit } = req.query;
 
@@ -122,7 +122,7 @@ class MovieController {
     }
   }
 
-  async handleSearchMovieByTile(req, res, next) {
+  async handleSearchMovieByTile(req, res) {
     const { title, page, limit } = req.query;
 
     if (!title && !page && !limit) {
@@ -151,7 +151,7 @@ class MovieController {
     }
   }
 
-  async handleEditMovie(req, res, next) {
+  async handleEditMovie(req, res) {
     const {
       title,
       description,
@@ -227,7 +227,7 @@ class MovieController {
     }
   }
 
-  async handleDeleteMovie(req, res, next) {
+  async handleDeleteMovie(req, res) {
     const { id } = req.params;
 
     if (!id) {
@@ -250,6 +250,57 @@ class MovieController {
       return res.status(500).json({
         statusCode: 2,
         message: "Có lỗi xảy ra tại handleDeleteMovie",
+      });
+    }
+  }
+
+  async handleGetTrendingMovie(req, res) {
+    try {
+      const response = await movieServices.getTrendingMovie();
+      if (response.statusCode === 0) {
+        return res.status(200).json(response);
+      } else {
+        return res.status(400).json(response);
+      }
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        statusCode: 2,
+        message: "Có lỗi xảy ra tại handleGetTrendingMovie",
+      });
+    }
+  }
+
+  async handleGetActiveTrending(req, res) {
+    try {
+      const response = await movieServices.getActiveMovies();
+      if (response.statusCode === 0) {
+        return res.status(200).json(response);
+      } else {
+        return res.status(400).json(response);
+      }
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        statusCode: 2,
+        message: "Có lỗi xảy ra tại handleGetActiveTrending",
+      });
+    }
+  }
+
+  async handleGetNextMovies(req, res) {
+    try {
+      const response = await movieServices.getNextMovies();
+      if (response.statusCode === 0) {
+        return res.status(200).json(response);
+      } else {
+        return res.status(400).json(response);
+      }
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        statusCode: 2,
+        message: "Có lỗi xảy ra tại handleGetNextMovies",
       });
     }
   }

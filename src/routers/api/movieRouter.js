@@ -51,4 +51,10 @@ router.get(
 // [GET] api/v1/movie/search-movies-by-title?title=
 router.get("/search-movies-by-title", MovieController.handleSearchMovieByTile);
 
+router.get("/trending-movies", MovieController.handleGetTrendingMovie);
+
+router.get("/active-movies", MovieController.handleGetTrendingMovie);
+
+router.get("/next-movies", MovieController.handleGetNextMovies);
+
 export default router;
