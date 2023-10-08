@@ -375,6 +375,34 @@ class movieServices {
       };
     }
   }
+
+  async getMovieById({ id }) {
+    try {
+      const movieDoc = await db.Movie.findOne({
+        where: {
+          id: id,
+        },
+      });
+      if (!movieDoc) {
+        return {
+          statusCode: 1,
+          message: "Không tìm thấy phim",
+        };
+      }
+
+      return {
+        statusCode: 0,
+        message: "Lấy dữ liệu phim thành công",
+        data: movieDoc,
+      };
+    } catch (error) {
+      console.error(error);
+      return {
+        statusCode: 1,
+        message: "Đã có lỗi xảy ra khi getMovieById",
+      };
+    }
+  }
 }
 
 export default new movieServices();
