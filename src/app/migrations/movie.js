@@ -6,7 +6,7 @@ module.exports = {
       id: {
         allowNull: false,
         primaryKey: true,
-        type: Sequelize.UUIDV4,
+        defaultValue: Sequelize.UUIDV4,
         type: Sequelize.UUID,
       },
       title: {
@@ -37,7 +37,7 @@ module.exports = {
         type: Sequelize.DATE,
       },
       images: {
-        type: Sequelize.ARRAY(Sequelize.JSONB),
+        type: Sequelize.ARRAY(Sequelize.STRING),
       },
       genre: {
         type: Sequelize.ARRAY(Sequelize.STRING),
@@ -48,9 +48,7 @@ module.exports = {
       ageRequire: {
         type: Sequelize.INTEGER,
       },
-      price: {
-        type: Sequelize.INTEGER,
-      },
+
       countBooked: {
         type: Sequelize.INTEGER,
         defaultValue: 0,

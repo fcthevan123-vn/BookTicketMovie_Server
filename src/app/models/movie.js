@@ -28,11 +28,10 @@ module.exports = (sequelize, DataTypes) => {
       subtitle: DataTypes.STRING,
       releaseDate: DataTypes.DATE,
       endDate: DataTypes.DATE,
-      images: DataTypes.ARRAY(DataTypes.JSONB),
+      images: DataTypes.ARRAY(DataTypes.STRING),
       genre: DataTypes.ARRAY(DataTypes.STRING),
       duration: DataTypes.INTEGER,
       ageRequire: DataTypes.INTEGER,
-      price: DataTypes.INTEGER,
       countBooked: {
         type: DataTypes.INTEGER,
         defaultValue: 0,

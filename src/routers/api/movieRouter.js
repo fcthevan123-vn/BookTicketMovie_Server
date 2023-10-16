@@ -34,16 +34,11 @@ router.patch(
 );
 
 // [GET] api/v1/movie/all-movies?isCount=
-router.get(
-  "/all-movies",
-  authorizationAdmin,
-  MovieController.handleGetAllMovies
-);
+router.get("/all-movies", MovieController.handleGetAllMovies);
 
 // [GET] api/v1/movie/all-limit-movies?page=&?limit=
 router.get(
   "/all-limit-movies",
-  authorizationAdmin,
   validateInputMovie,
   MovieController.handleGetLimitMovies
 );

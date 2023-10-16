@@ -2,8 +2,9 @@
 /* eslint-disable no-undef */
 "use strict";
 const { Model } = require("sequelize");
+
 module.exports = (sequelize, DataTypes) => {
-  class User extends Model {
+  class MovieHall extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -11,29 +12,35 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      MovieHall.belongsTo(models.Cinema, {
+        foreignKey: "cinemaId",
+      });
+      MovieHall.belongsTo(models.Layout, {
+        foreignKey: "layoutId",
+      });
+      MovieHall.belongsTo(models.RoomType, {
+        foreignKey: "roomTypeId",
+      });
     }
   }
-  User.init(
+  MovieHall.init(
     {
       id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
       },
-      fullName: DataTypes.STRING,
-      email: DataTypes.STRING,
-      isVerifyEmail: DataTypes.BOOLEAN,
-      password: DataTypes.STRING,
-      phone: DataTypes.INTEGER,
-      address: DataTypes.STRING,
-      sex: DataTypes.INTEGER,
-      age: DataTypes.INTEGER,
-      type: DataTypes.STRING,
+      number: DataTypes.INTEGER,
+      name: DataTypes.STRING,
+      roomTypeId: DataTypes.UUID,
+      cinemaId: DataTypes.UUID,
+      layoutId: DataTypes.UUID,
     },
     {
       sequelize,
-      modelName: "User",
+      modelName: "MovieHall",
     }
   );
-  return User;
+
+  return MovieHall;
 };

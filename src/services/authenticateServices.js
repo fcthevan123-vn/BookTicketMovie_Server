@@ -32,6 +32,7 @@ class AuthenticateServices {
         type: userExisted.type,
       };
 
+      // eslint-disable-next-line no-undef
       const tokenJWT = jwt.sign(data, process.env.ACCESS_TOKEN_SECRET, {
         expiresIn: "1d",
       });
