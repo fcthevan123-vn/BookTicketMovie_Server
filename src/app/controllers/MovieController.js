@@ -307,7 +307,7 @@ class MovieController {
 
   async handleGetMovieById(req, res) {
     const { id } = req.params;
-
+    console.log("id asdasdasd", id);
     if (!id) {
       return res.status(401).json({
         statusCode: 1,

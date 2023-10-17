@@ -9,4 +9,6 @@ router.post("/create", authorizationAdmin, CinemaController.handleCreateCinema);
 
 router.get("/get-all", CinemaController.handleGetAllCinemas);
 
+router.get("/get-limit", CinemaController.handleGetLimitCinemas);
+
 export default router;

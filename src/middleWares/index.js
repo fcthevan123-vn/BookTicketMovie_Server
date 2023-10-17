@@ -24,7 +24,7 @@ export function authorizationToken(req, res, next) {
     }
 
     const tokenJWT = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
-    console.log("tokenJWT", tokenJWT);
+
     if (!tokenJWT) {
       return res.status(400).json({
         statusCode: 2,

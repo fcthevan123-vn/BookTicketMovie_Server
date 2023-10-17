@@ -93,6 +93,29 @@ class CinemaServices {
       };
     }
   }
+
+  async getLimitCinema({ page, limit }) {
+    try {
+      const { count, rows: cinemaDoc } = await db.Cinema.findAndCountAll({
+        offset: (page - 1) * limit,
+        limit: limit,
+        order: [["createdAt", "ASC"]],
+      });
+      if (cinemaDoc) {
+        return {
+          statusCode: 0,
+          message: "Lấy dữ liệu thành công",
+          data: cinemaDoc,
+          rows: count,
+        };
+      }
+    } catch (error) {
+      return {
+        statusCode: 1,
+        message: "Đã có lỗi xảy ra khi getLimitCinema",
+      };
+    }
+  }
 }
 
 export default new CinemaServices();
