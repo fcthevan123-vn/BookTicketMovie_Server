@@ -39,12 +39,10 @@ class MovieHallController {
       return res.status(400).json(response);
     } catch (error) {
       console.log(error);
-      return res
-        .status(500)
-        .json({
-          message: "Có lỗi tại handleCreateMovieHall",
-          err: error.message,
-        });
+      return res.status(500).json({
+        message: "Có lỗi tại handleCreateMovieHall",
+        err: error.message,
+      });
     }
   }
 
@@ -58,12 +56,10 @@ class MovieHallController {
       return res.status(400).json(response);
     } catch (error) {
       console.log(error);
-      return res
-        .status(500)
-        .json({
-          message: "Có lỗi tại handleReadMovieHall",
-          err: error.message,
-        });
+      return res.status(500).json({
+        message: "Có lỗi tại handleReadMovieHall",
+        err: error.message,
+      });
     }
   }
 
@@ -84,12 +80,10 @@ class MovieHallController {
       return res.status(400).json(response);
     } catch (error) {
       console.log(error);
-      return res
-        .status(500)
-        .json({
-          message: "Có lỗi tại handleUpdateMovieHall",
-          err: error.message,
-        });
+      return res.status(500).json({
+        message: "Có lỗi tại handleUpdateMovieHall",
+        err: error.message,
+      });
     }
   }
 
@@ -103,12 +97,10 @@ class MovieHallController {
       return res.status(400).json(response);
     } catch (error) {
       console.log(error);
-      return res
-        .status(500)
-        .json({
-          message: "Có lỗi tại handleDeleteMovieHall",
-          err: error.message,
-        });
+      return res.status(500).json({
+        message: "Có lỗi tại handleDeleteMovieHall",
+        err: error.message,
+      });
     }
   }
 }

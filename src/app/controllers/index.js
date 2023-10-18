@@ -4,3 +4,5 @@ export { default as MovieController } from "./MovieController";
 export { default as S3Controller } from "./S3Controller";
 export { default as CinemaController } from "./CinemaController";
 export { default as MovieHallController } from "./MovieHallController";
+export { default as RoomTypeController } from "./RoomTypeController";
+export { default as LayoutController } from "./LayoutController";
