@@ -7,7 +7,7 @@ module.exports = {
       "Seats",
       [
         {
-          id: uuidv4(),
+          id: "f03bf574-96c0-4dcd-aea3-ee797353c596",
           name: "A1",
           rowNumber: 1,
           seatNumber: 1,
@@ -17,7 +17,7 @@ module.exports = {
           updatedAt: "2023-09-16T03:58:44.739Z",
         },
         {
-          id: uuidv4(),
+          id: "ab4363dd-b591-4849-88ed-e5b904f7a3af",
           name: "A2",
           rowNumber: 1,
           seatNumber: 2,

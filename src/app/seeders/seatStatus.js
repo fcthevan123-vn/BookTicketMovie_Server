@@ -4,21 +4,23 @@ const { v4: uuidv4 } = require("uuid");
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.bulkInsert(
-      "Cinemas",
+      "SeatStatuses",
       [
         {
-          id: "399e049f-345c-4b6a-bca7-cf91abbdb85f",
-          name: "Rạp chiếu CGV",
-          location: ["1", "2", "49"],
-          detailLocation: "Near Park 1",
+          id: "a45c620c-17c2-4f73-9aef-cff740d9c7aa",
+          name: "Đã được đặt",
+          isBooked: true,
+          seatId: "f03bf574-96c0-4dcd-aea3-ee797353c596",
+          showId: "c83a15d0-2226-4779-9464-e903591cabf7",
           createdAt: "2023-09-16T03:58:44.739Z",
           updatedAt: "2023-09-16T03:58:44.739Z",
         },
         {
-          id: "4f7d6e71-60c1-41e5-8674-534ad93c7f31",
-          name: "Rạp chiếu CGV 1",
-          location: ["1", "3", "94"],
-          detailLocation: "Near Park 1",
+          id: "c90c7edd-0129-488c-b8bc-a9e7d60ed9ed",
+          name: "Đã được đặt",
+          isBooked: true,
+          seatId: "ab4363dd-b591-4849-88ed-e5b904f7a3af",
+          showId: "c83a15d0-2226-4779-9464-e903591cabf7",
           createdAt: "2023-09-16T03:58:44.739Z",
           updatedAt: "2023-09-16T03:58:44.739Z",
         },

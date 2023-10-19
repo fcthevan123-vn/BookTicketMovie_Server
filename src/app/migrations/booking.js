@@ -2,17 +2,24 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("SeatStatuses", {
+    await queryInterface.createTable("Bookings", {
       id: {
         allowNull: false,
         primaryKey: true,
         defaultValue: Sequelize.UUIDV4,
         type: Sequelize.UUID,
       },
-      name: {
-        type: Sequelize.STRING,
+      userId: {
+        allowNull: false,
+        defaultValue: Sequelize.UUIDV4,
+        type: Sequelize.UUID,
       },
-      isBooked: {
+      showId: {
+        allowNull: false,
+        defaultValue: Sequelize.UUIDV4,
+        type: Sequelize.UUID,
+      },
+      isPaid: {
         type: Sequelize.BOOLEAN,
         defaultValue: false,
       },
@@ -24,19 +31,9 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE,
       },
-      seatId: {
-        allowNull: false,
-        type: Sequelize.UUID,
-        defaultValue: Sequelize.UUIDV4,
-      },
-      showId: {
-        allowNull: false,
-        type: Sequelize.UUID,
-        defaultValue: Sequelize.UUIDV4,
-      },
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("SeatStatuses");
+    await queryInterface.dropTable("Bookings");
   },
 };

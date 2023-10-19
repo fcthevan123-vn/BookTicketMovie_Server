@@ -3,7 +3,7 @@
 "use strict";
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-  class Seat extends Model {
+  class Show extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -11,37 +11,36 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Seat.belongsTo(models.Layout, {
-        foreignKey: "layoutId",
+      Show.hasMany(models.Booking, {
+        foreignKey: "showId",
       });
-      Seat.belongsTo(models.SeatType, {
-        foreignKey: "seatTypeId",
+      Show.belongsTo(models.Movie, {
+        foreignKey: "movieId",
       });
-      Seat.hasMany(models.SeatStatus, {
-        foreignKey: "seatId",
+      Show.belongsTo(models.MovieHall, {
+        foreignKey: "movieHallId",
       });
-      Seat.hasMany(models.SeatBookingDetail, {
-        foreignKey: "seatId",
+      Show.hasMany(models.Booking, {
+        foreignKey: "showId",
       });
     }
   }
-  Seat.init(
+  Show.init(
     {
       id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
       },
-      name: DataTypes.STRING,
-      rowNumber: DataTypes.INTEGER,
-      seatNumber: DataTypes.INTEGER,
-      seatTypeId: DataTypes.UUID,
-      layoutId: DataTypes.UUID,
+      movieId: DataTypes.UUID,
+      movieHallId: DataTypes.UUID,
+      startTime: DataTypes.DATE,
+      endTime: DataTypes.DATE,
     },
     {
       sequelize,
-      modelName: "Seat",
+      modelName: "Show",
     }
   );
-  return Seat;
+  return Show;
 };

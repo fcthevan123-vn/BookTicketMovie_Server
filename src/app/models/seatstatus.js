@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-undef */
 "use strict";
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
@@ -12,9 +14,9 @@ module.exports = (sequelize, DataTypes) => {
       SeatStatus.belongsTo(models.Seat, {
         foreignKey: "seatId",
       });
-      // SeatStatus.belongsTo(models.Show, {
-      //   foreignKey: "showId",
-      // });
+      SeatStatus.belongsTo(models.Show, {
+        foreignKey: "showId",
+      });
     }
   }
   SeatStatus.init(
@@ -30,7 +32,7 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: false,
       },
       seatId: DataTypes.UUID,
-      // showId: DataTypes.UUID,
+      showId: DataTypes.UUID,
     },
     {
       sequelize,

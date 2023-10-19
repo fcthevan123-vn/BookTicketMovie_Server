@@ -4,21 +4,21 @@ const { v4: uuidv4 } = require("uuid");
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.bulkInsert(
-      "Cinemas",
+      "Bookings",
       [
         {
-          id: "399e049f-345c-4b6a-bca7-cf91abbdb85f",
-          name: "Rạp chiếu CGV",
-          location: ["1", "2", "49"],
-          detailLocation: "Near Park 1",
+          id: "37556930-b699-486c-bbec-805a7de77dff",
+          userId: "33f3892a-b3dd-4c49-9838-3138797f989c",
+          showId: "c83a15d0-2226-4779-9464-e903591cabf7",
+          isPaid: true,
           createdAt: "2023-09-16T03:58:44.739Z",
           updatedAt: "2023-09-16T03:58:44.739Z",
         },
         {
-          id: "4f7d6e71-60c1-41e5-8674-534ad93c7f31",
-          name: "Rạp chiếu CGV 1",
-          location: ["1", "3", "94"],
-          detailLocation: "Near Park 1",
+          id: "fc182821-aba8-43d1-b753-92296f8baffd",
+          userId: "33f3892a-b3dd-4c49-9838-3138797f989c",
+          showId: "c83a15d0-2226-4779-9464-e903591cabf7",
+          isPaid: true,
           createdAt: "2023-09-16T03:58:44.739Z",
           updatedAt: "2023-09-16T03:58:44.739Z",
         },
