@@ -5,6 +5,7 @@ import cinemaRouter from "./cinemaRouter";
 import movieHallRouter from "./movieHallRouter";
 import roomTypeRouter from "./roomTypeRouter";
 import layoutRouter from "./layoutRouter";
+import showRouter from "./showRouter";
 
 import express from "express";
 const router = express.Router();
@@ -16,5 +17,6 @@ router.use("/cinema", cinemaRouter);
 router.use("/movie-hall", movieHallRouter);
 router.use("/roomType", roomTypeRouter);
 router.use("/layout", layoutRouter);
+router.use("/show", showRouter);
 
 export default router;
