@@ -1,3 +1,4 @@
+import { Op } from "sequelize";
 import db from "../app/models";
 
 class CinemaServices {
@@ -80,6 +81,35 @@ class CinemaServices {
   async getAllCinema() {
     try {
       const cinemas = await db.Cinema.findAll();
+
+      return {
+        statusCode: 0,
+        message: "Lấy danh sách rạp phim thành công",
+        data: cinemas,
+      };
+    } catch (error) {
+      return {
+        statusCode: 2,
+        message: "Có lỗi xảy ra khi lấy danh sách rạp phim",
+      };
+    }
+  }
+
+  async getAllCinemaByCity(locationCode) {
+    try {
+      const cinemas = await db.Cinema.findAll({
+        where: {
+          location: {
+            [Op.contains]: [locationCode],
+          },
+        },
+        include: [
+          {
+            model: db.MovieHall,
+            include: [{ model: db.RoomType }],
+          },
+        ],
+      });
 
       return {
         statusCode: 0,

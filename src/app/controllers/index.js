@@ -7,3 +7,4 @@ export { default as MovieHallController } from "./MovieHallController";
 export { default as RoomTypeController } from "./RoomTypeController";
 export { default as LayoutController } from "./LayoutController";
 export { default as ShowController } from "./ShowController";
+export { default as SeatController } from "./SeatController";

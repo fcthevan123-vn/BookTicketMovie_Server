@@ -20,6 +20,13 @@ module.exports = {
           createdAt: "2023-09-16T03:58:44.739Z",
           updatedAt: "2023-09-16T03:58:44.739Z",
         },
+        {
+          id: "db6d5f6e-8d9a-47a1-83ff-d2710b7b9222",
+          name: "5D",
+          priceMultiplier: 1.7,
+          createdAt: "2023-09-16T03:58:44.739Z",
+          updatedAt: "2023-09-16T03:58:44.739Z",
+        },
       ],
       {}
     );

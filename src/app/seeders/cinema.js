@@ -16,7 +16,7 @@ module.exports = {
         },
         {
           id: "4f7d6e71-60c1-41e5-8674-534ad93c7f31",
-          name: "Rạp chiếu CGV 1",
+          name: "Rạp chiếu Lotte",
           location: ["1", "3", "94"],
           detailLocation: "Near Park 1",
           createdAt: "2023-09-16T03:58:44.739Z",

@@ -33,6 +33,7 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
       },
       movieId: DataTypes.UUID,
+      date: DataTypes.DATEONLY,
       movieHallId: DataTypes.UUID,
       startTime: DataTypes.DATE,
       endTime: DataTypes.DATE,

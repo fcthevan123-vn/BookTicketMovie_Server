@@ -17,6 +17,10 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE,
       },
+      date: {
+        allowNull: false,
+        type: Sequelize.DATEONLY,
+      },
       movieId: {
         allowNull: false,
         type: Sequelize.UUID,

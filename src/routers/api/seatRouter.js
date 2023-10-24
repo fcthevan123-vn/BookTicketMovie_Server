@@ -1,5 +1,5 @@
 import express from "express";
-import { ShowController } from "../../app/controllers";
+import { SeatController } from "../../app/controllers";
 
 const router = express.Router();
 
@@ -11,6 +11,6 @@ const router = express.Router();
 
 // router.get("/get-all", RoomTypeController.handleReadAllRoomType);
 
-router.get("/before-pick-seat", ShowController.handleGetShowByMovieId);
+router.get("/all-seats-by-show/:id", SeatController.handleGetAllSeatByShowId);
 
 export default router;

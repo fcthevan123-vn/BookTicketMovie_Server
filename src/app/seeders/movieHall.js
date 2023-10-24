@@ -17,6 +17,16 @@ module.exports = {
           updatedAt: "2023-09-16T03:58:44.739Z",
         },
         {
+          id: "c4b2c270-8e74-408e-92df-94f69964e395",
+          name: "Phòng chiếu green house",
+          number: 1,
+          roomTypeId: "db6d5f6e-8d9a-47a1-83ff-d2710b7b9222",
+          cinemaId: "399e049f-345c-4b6a-bca7-cf91abbdb85f",
+          layoutId: "38eb74e4-5ba3-4aa9-9959-2ca225ce9889",
+          createdAt: "2023-09-16T03:58:44.739Z",
+          updatedAt: "2023-09-16T03:58:44.739Z",
+        },
+        {
           id: "b33f60e1-a6f7-4225-bb5a-8d11a569fde8",
           name: "Phòng chiếu 2",
           number: 2,

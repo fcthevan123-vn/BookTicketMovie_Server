@@ -7,3 +7,4 @@ export { default as movieHallServices } from "./movieHallServices";
 export { default as roomTypeServices } from "./roomTypeServices";
 export { default as layoutServices } from "./layoutServices";
 export { default as showServices } from "./showServices";
+export { default as seatServices } from "./seatServices";
