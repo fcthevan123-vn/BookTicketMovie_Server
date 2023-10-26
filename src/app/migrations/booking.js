@@ -23,6 +23,13 @@ module.exports = {
         type: Sequelize.BOOLEAN,
         defaultValue: false,
       },
+      paymentMethod: {
+        type: Sequelize.STRING,
+        defaultValue: "direct",
+      },
+      totalPrice: {
+        type: Sequelize.INTEGER,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

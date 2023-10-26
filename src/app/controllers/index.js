@@ -8,3 +8,4 @@ export { default as RoomTypeController } from "./RoomTypeController";
 export { default as LayoutController } from "./LayoutController";
 export { default as ShowController } from "./ShowController";
 export { default as SeatController } from "./SeatController";
+export { default as BookingController } from "./BookingController";

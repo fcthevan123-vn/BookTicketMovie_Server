@@ -7,11 +7,13 @@ import roomTypeRouter from "./roomTypeRouter";
 import layoutRouter from "./layoutRouter";
 import showRouter from "./showRouter";
 import seatRouter from "./seatRouter";
+import bookingRouter from "./bookingRouter";
 
 import express from "express";
 const router = express.Router();
 
 router.use("/authenticate", authenticateRouter);
+router.use("/booking", bookingRouter);
 router.use("/user", userRouter);
 router.use("/movie", movieRouter);
 router.use("/cinema", cinemaRouter);

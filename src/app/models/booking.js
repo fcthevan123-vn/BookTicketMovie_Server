@@ -11,9 +11,10 @@ module.exports = (sequelize, DataTypes) => {
       Booking.belongsTo(models.Show, {
         foreignKey: "showId",
       });
-      Booking.hasMany(models.SeatBookingDetail, {
+      Booking.hasMany(models.SeatStatus, {
         foreignKey: "bookingId",
       });
+
       // Payment here (update soon)
     }
   }
@@ -26,6 +27,8 @@ module.exports = (sequelize, DataTypes) => {
       },
       userId: DataTypes.UUID,
       showId: DataTypes.UUID,
+      totalPrice: DataTypes.INTEGER,
+      paymentMethod: DataTypes.STRING,
       isPaid: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,

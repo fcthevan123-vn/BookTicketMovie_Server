@@ -17,6 +17,9 @@ module.exports = (sequelize, DataTypes) => {
       SeatStatus.belongsTo(models.Show, {
         foreignKey: "showId",
       });
+      SeatStatus.belongsTo(models.Booking, {
+        foreignKey: "bookingId",
+      });
     }
   }
   SeatStatus.init(
@@ -33,6 +36,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       seatId: DataTypes.UUID,
       showId: DataTypes.UUID,
+      bookingId: DataTypes.UUID,
     },
     {
       sequelize,

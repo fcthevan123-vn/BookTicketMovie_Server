@@ -8,3 +8,5 @@ export { default as roomTypeServices } from "./roomTypeServices";
 export { default as layoutServices } from "./layoutServices";
 export { default as showServices } from "./showServices";
 export { default as seatServices } from "./seatServices";
+export { default as seatStatusServices } from "./seatStatusServices";
+export { default as bookingServices } from "./bookingServices";
