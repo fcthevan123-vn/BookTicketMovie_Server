@@ -11,7 +11,6 @@ class movieServices {
     releaseDate,
     endDate,
     duration,
-    price,
     language,
     country,
     subtitle,
@@ -38,7 +37,6 @@ class movieServices {
         language,
         country,
         subtitle,
-        price,
         directors,
         actors,
         genre,
@@ -169,7 +167,6 @@ class movieServices {
     releaseDate,
     endDate,
     duration,
-    price,
     language,
     country,
     subtitle,
@@ -191,7 +188,8 @@ class movieServices {
 
       if (imagesDelete) {
         imageMerge = movieExisted.images.filter(
-          (image) => !imagesDelete.includes(image.imageName)
+          (image) =>
+            image !== "https://show-booking.s3.amazonaws.com/" + imagesDelete
         );
       } else {
         imageMerge = movieExisted.images;
@@ -208,7 +206,6 @@ class movieServices {
           language,
           country,
           subtitle,
-          price,
           directors,
           actors,
           genre,
@@ -255,7 +252,7 @@ class movieServices {
 
       let imagesToDelete = [];
       if (movieExisted.images.length > 0) {
-        imagesToDelete = movieExisted.images.map((img) => img.imageName);
+        imagesToDelete = movieExisted.images.map((img) => img);
       }
 
       await movieExisted.destroy();

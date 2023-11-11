@@ -17,7 +17,6 @@ const validateCreateMovie = [
   body("duration").notEmpty().withMessage("Trường thời lượng là bắt buộc"),
   body("language").notEmpty().withMessage("Trường ngôn ngữ là bắt buộc"),
   body("country").notEmpty().withMessage("Trường quốc gia là bắt buộc"),
-  body("price").notEmpty().withMessage("Trường giá là bắt buộc"),
   body("subtitle").notEmpty().withMessage("Trường phụ đề là bắt buộc"),
   body("directors").notEmpty().withMessage("Trường đạo diễn là bắt buộc"),
   body("actors").notEmpty().withMessage("Trường diễn viên là bắt buộc"),

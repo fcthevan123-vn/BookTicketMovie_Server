@@ -35,7 +35,7 @@ class UserServices {
 
       let userDoc;
 
-      if (type.length > 0) {
+      if (type && type.length > 0) {
         userDoc = await db.User.create({
           fullName,
           email,
@@ -71,6 +71,7 @@ class UserServices {
         };
       }
     } catch (error) {
+      console.log("error", error);
       return {
         statusCode: 5,
         message: "Có lỗi xảy ra tại createUser",

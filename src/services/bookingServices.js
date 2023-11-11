@@ -1,4 +1,5 @@
 import db from "../app/models";
+import seatServices from "./seatServices";
 import seatStatusServices from "./seatStatusServices";
 
 class BookingServices {
@@ -11,6 +12,20 @@ class BookingServices {
     isPaid
   ) {
     try {
+      for (let seatId of seatIds) {
+        const checkSeatAvailable = await seatStatusServices.checkSeatStatus(
+          seatId,
+          showId
+        );
+        if (checkSeatAvailable.statusCode !== 0) {
+          return {
+            statusCode: 5,
+            message: `Ghế ${checkSeatAvailable.data.Seat} mà bạn chọn đã được ai đó vừa mới đặt, vui lòng tải lại trang và chọn ghế khác.`,
+            data: checkSeatAvailable,
+          };
+        }
+      }
+
       const bookingDoc = await db.Booking.create({
         userId: userId,
         showId: showId,
@@ -98,7 +113,7 @@ class BookingServices {
       console.log(error);
       return {
         error: error.message,
-        statusCode: 3,
+        statusCode: 4,
         message:
           "Đã có lỗi xảy ra tại getAllBookingsByUserId - BookingServices",
       };

@@ -18,10 +18,7 @@ class S3Controller {
           .resize({ height: 1080, width: 1920, fit: "cover" })
           .toBuffer();
         const imageName = generateFileName(10);
-        imageArr.push({
-          imageName: imageName,
-          imageUrl: urlPrefix + imageName,
-        });
+        imageArr.push(urlPrefix + imageName);
         await uploadFile(fileBuffer, imageName, f.mimetype);
       }
 
