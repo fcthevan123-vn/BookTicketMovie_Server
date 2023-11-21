@@ -35,6 +35,10 @@ module.exports = {
       age: {
         type: Sequelize.INTEGER,
       },
+      count: {
+        defaultValue: 0,
+        type: Sequelize.INTEGER,
+      },
       type: {
         type: Sequelize.STRING,
         defaultValue: "user",

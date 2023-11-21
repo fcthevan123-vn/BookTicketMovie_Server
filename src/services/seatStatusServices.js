@@ -30,6 +30,32 @@ class SeatStatusServices {
       };
     }
   }
+
+  async deleteSeatStatus(id) {
+    try {
+      const seatStatusDoc = await db.SeatStatus.findByPk(id);
+
+      if (!seatStatusDoc) {
+        return {
+          statusCode: 1,
+          message: "Không tìm thấy SeatStatus",
+        };
+      }
+
+      await seatStatusDoc.destroy();
+
+      return {
+        statusCode: 0,
+        message: "Xoá seatStatus thành công",
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        statusCode: 3,
+        message: "Đã có lỗi xảy ra tại deleteSeatStatus - SeatStatusServices",
+      };
+    }
+  }
   async checkSeatStatus(seatId, showId) {
     try {
       const seatStatusDoc = await db.SeatStatus.findAll({
@@ -49,6 +75,7 @@ class SeatStatusServices {
           statusCode: 1,
           message: "Ghế đã được đặt",
           data: seatStatusDoc,
+          seat: seatStatusDoc.Seat,
         };
       }
 

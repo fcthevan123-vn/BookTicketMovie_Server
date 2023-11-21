@@ -8,6 +8,10 @@ module.exports = (sequelize, DataTypes) => {
       Booking.belongsTo(models.User, {
         foreignKey: "userId",
       });
+      Booking.belongsTo(models.User, {
+        foreignKey: "staffId",
+        as: "Staff",
+      });
       Booking.belongsTo(models.Show, {
         foreignKey: "showId",
       });
@@ -26,9 +30,11 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
       },
       userId: DataTypes.UUID,
+      staffId: DataTypes.UUID,
       showId: DataTypes.UUID,
       totalPrice: DataTypes.INTEGER,
       paymentMethod: DataTypes.STRING,
+      status: DataTypes.STRING,
       isPaid: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,

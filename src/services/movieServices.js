@@ -400,6 +400,52 @@ class movieServices {
       };
     }
   }
+
+  async getStatistic({ id }) {
+    try {
+      const movieDoc = await db.Movie.findAll({
+        where: {
+          id: id,
+        },
+        include: [
+          {
+            model: db.Show,
+            include: [
+              {
+                model: db.Booking,
+                // where: {
+                //   isPaid: true,
+                // },
+                include: [
+                  {
+                    model: db.User,
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      });
+      if (!movieDoc) {
+        return {
+          statusCode: 1,
+          message: "Không tìm thấy phim",
+        };
+      }
+
+      return {
+        statusCode: 0,
+        message: "Lấy dữ liệu thống kê thành công",
+        data: movieDoc,
+      };
+    } catch (error) {
+      console.error(error);
+      return {
+        statusCode: 1,
+        message: "Đã có lỗi xảy ra khi getStatistic",
+      };
+    }
+  }
 }
 
 export default new movieServices();

@@ -14,6 +14,11 @@ module.exports = {
         defaultValue: Sequelize.UUIDV4,
         type: Sequelize.UUID,
       },
+      staffId: {
+        allowNull: true,
+        defaultValue: Sequelize.UUIDV4,
+        type: Sequelize.UUID,
+      },
       showId: {
         allowNull: false,
         defaultValue: Sequelize.UUIDV4,
@@ -25,7 +30,11 @@ module.exports = {
       },
       paymentMethod: {
         type: Sequelize.STRING,
-        defaultValue: "direct",
+        defaultValue: "Trực tiếp",
+      },
+      status: {
+        type: Sequelize.STRING,
+        defaultValue: "Chờ xác nhận",
       },
       totalPrice: {
         type: Sequelize.INTEGER,

@@ -20,7 +20,7 @@ class BookingServices {
         if (checkSeatAvailable.statusCode !== 0) {
           return {
             statusCode: 5,
-            message: `Ghế ${checkSeatAvailable.data.Seat} mà bạn chọn đã được ai đó vừa mới đặt, vui lòng tải lại trang và chọn ghế khác.`,
+            message: `Ghế mà bạn chọn đã được ai đó vừa mới đặt, vui lòng tải lại trang và chọn ghế khác.`,
             data: checkSeatAvailable,
           };
         }
@@ -94,6 +94,7 @@ class BookingServices {
               },
             ],
           },
+          { model: db.User, as: "Staff" },
         ],
       });
 
@@ -116,6 +117,158 @@ class BookingServices {
         statusCode: 4,
         message:
           "Đã có lỗi xảy ra tại getAllBookingsByUserId - BookingServices",
+      };
+    }
+  }
+
+  async deleteBooking(bookingId) {
+    try {
+      const infoBooking = await db.Booking.findOne({
+        where: {
+          id: bookingId,
+        },
+        include: [
+          {
+            model: db.Show,
+            include: [
+              {
+                model: db.MovieHall,
+                include: [{ model: db.Cinema }, { model: db.RoomType }],
+              },
+              {
+                model: db.Movie,
+              },
+            ],
+          },
+          {
+            model: db.SeatStatus,
+            include: [
+              {
+                model: db.Seat,
+              },
+            ],
+          },
+        ],
+      });
+
+      if (!infoBooking) {
+        return {
+          statusCode: 1,
+          message: "Không tìm thấy vé",
+        };
+      }
+
+      if (infoBooking.status == "Chờ xác nhận") {
+        await infoBooking.destroy();
+
+        for (const seatStatus of infoBooking.SeatStatuses) {
+          await seatStatusServices.deleteSeatStatus(seatStatus.id);
+        }
+      } else {
+        return {
+          statusCode: 2,
+          message:
+            "Vé này đã được cập nhật bởi nhân viên, vui lòng tải lại trang và liên hệ với nhân viên để huỷ.",
+        };
+      }
+
+      return {
+        statusCode: 0,
+        message: "Huỷ vé thành công",
+        data: infoBooking,
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        error: error.message,
+        statusCode: 4,
+        message: "Đã có lỗi xảy ra tại deleteBooking - BookingServices",
+      };
+    }
+  }
+
+  async updateBookingByStaff(bookingId, staffId, status) {
+    try {
+      const booking = await db.Booking.findByPk(bookingId);
+
+      if (!booking) {
+        return {
+          statusCode: 1,
+          message: "Không tìm thấy vé",
+        };
+      }
+
+      if (status == "Đã thanh toán") {
+        await booking.update({ staffId, status, isPaid: true });
+      } else {
+        await booking.update({ staffId, status });
+      }
+
+      return {
+        statusCode: 0,
+        message: "Cập nhật thành công",
+        data: booking,
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        error: error.message,
+        statusCode: 4,
+        message: "Đã có lỗi xảy ra tại updateBookingByStaff - BookingServices",
+      };
+    }
+  }
+
+  async getBookingByStatus(status) {
+    try {
+      const allBookings = await db.Booking.findAll({
+        where: {
+          status: status,
+        },
+        include: [
+          {
+            model: db.Show,
+            include: [
+              {
+                model: db.MovieHall,
+                include: [{ model: db.Cinema }, { model: db.RoomType }],
+              },
+              {
+                model: db.Movie,
+              },
+            ],
+          },
+          { model: db.User },
+          { model: db.User, as: "Staff" }, //staff id
+          {
+            model: db.SeatStatus,
+            include: [
+              {
+                model: db.Seat,
+              },
+            ],
+          },
+        ],
+      });
+
+      if (!allBookings) {
+        return {
+          statusCode: 1,
+          message: "Lỗi trong khi getBookingByStatus",
+        };
+      }
+
+      return {
+        statusCode: 0,
+        message: "Lấy booking thành công",
+        data: allBookings,
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        error: error.message,
+        statusCode: 4,
+        message: "Đã có lỗi xảy ra tại getBookingByStatus - BookingServices",
       };
     }
   }

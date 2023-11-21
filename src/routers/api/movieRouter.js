@@ -54,4 +54,6 @@ router.get("/next-movies", MovieController.handleGetNextMovies);
 
 router.get("/:id", MovieController.handleGetMovieById);
 
+router.get("/statistic/:id", MovieController.handleGetStatistic);
+
 export default router;

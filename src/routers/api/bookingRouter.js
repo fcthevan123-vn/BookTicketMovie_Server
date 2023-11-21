@@ -1,5 +1,6 @@
 import express from "express";
 import { BookingController } from "../../app/controllers";
+import { authorizationAdmin } from "../../middleWares";
 
 const router = express.Router();
 
@@ -8,6 +9,14 @@ router.post("/create", BookingController.handleCreateBooking);
 
 router.get("/by-user/:id", BookingController.handleGetBookingsByUserId);
 
-// router.get("/get-limit", CinemaController.handleGetLimitCinemas);
+router.delete("/:id", BookingController.handleDeleteBooking);
+
+router.post(
+  "/update",
+  authorizationAdmin,
+  BookingController.handleUpdateBooking
+);
+
+router.post("/by-status", BookingController.handleGetBookingByStatus);
 
 export default router;

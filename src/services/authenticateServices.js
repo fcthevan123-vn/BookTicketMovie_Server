@@ -46,6 +46,10 @@ class AuthenticateServices {
         };
       }
 
+      const countUpdate = parseInt(userExisted.count) + 1;
+
+      await userExisted.update({ count: countUpdate });
+
       return {
         statusCode: 0,
         message: "Đăng nhập thành công",
@@ -53,6 +57,7 @@ class AuthenticateServices {
         expiresIn,
       };
     } catch (error) {
+      console.log("error", error);
       return {
         statusCode: 4,
         message: "Có lỗi xảy ra tại Login!",
