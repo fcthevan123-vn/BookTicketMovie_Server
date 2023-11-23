@@ -8,7 +8,8 @@ import {
 
 const router = express.Router();
 
-// [POST] api/v1/movie/create
+router.get("/get-shows", MovieController.handleGetShowByMovie);
+
 router.post(
   "/create",
   authorizationAdmin,
@@ -17,14 +18,12 @@ router.post(
   MovieController.handleCreateMovie
 );
 
-// [POST] api/v1/movie/delete/:id
 router.delete(
   "/delete/:id",
   authorizationAdmin,
   MovieController.handleDeleteMovie
 );
 
-// [PATCH] api/v1/movie/edit/:id
 router.patch(
   "/edit/:id",
   authorizationAdmin,
@@ -33,17 +32,14 @@ router.patch(
   MovieController.handleEditMovie
 );
 
-// [GET] api/v1/movie/all-movies?isCount=
 router.get("/all-movies", MovieController.handleGetAllMovies);
 
-// [GET] api/v1/movie/all-limit-movies?page=&?limit=
 router.get(
   "/all-limit-movies",
   validateInputMovie,
   MovieController.handleGetLimitMovies
 );
 
-// [GET] api/v1/movie/search-movies-by-title?title=
 router.get("/search-movies-by-title", MovieController.handleSearchMovieByTile);
 
 router.get("/trending-movies", MovieController.handleGetTrendingMovie);

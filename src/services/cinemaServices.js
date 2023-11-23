@@ -80,7 +80,15 @@ class CinemaServices {
 
   async getAllCinema() {
     try {
-      const cinemas = await db.Cinema.findAll();
+      const cinemas = await db.Cinema.findAll({
+        include: [
+          {
+            model: db.MovieHall,
+            include: [{ model: db.RoomType }, { model: db.Layout }],
+          },
+        ],
+        nest: true,
+      });
 
       return {
         statusCode: 0,

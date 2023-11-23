@@ -328,6 +328,46 @@ class UserServices {
       };
     }
   }
+
+  async statisticUser() {
+    try {
+      const { rows: userMaleDoc } = await db.User.findAndCountAll({
+        // order: [["createdAt", "ASC"]],
+        where: {
+          sex: 0,
+        },
+      });
+
+      const { rows: userFemaleDoc } = await db.User.findAndCountAll({
+        // order: [["createdAt", "ASC"]],
+        where: {
+          sex: 1,
+        },
+      });
+
+      if (!userMaleDoc || !userFemaleDoc) {
+        return {
+          statusCode: 1,
+          message: "Không tìm thấy người dùng phù hợp",
+        };
+      }
+
+      return {
+        statusCode: 0,
+        message: "Tìm thấy người dùng phù hợp",
+        data: {
+          countMale: userMaleDoc.length,
+          countFemale: userFemaleDoc.length,
+        },
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        statusCode: 2,
+        message: "Có lỗi xảy ra khi tìm kiếm người dùng",
+      };
+    }
+  }
 }
 
 export default new UserServices();

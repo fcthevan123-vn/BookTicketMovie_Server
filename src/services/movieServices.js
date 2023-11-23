@@ -446,6 +446,57 @@ class movieServices {
       };
     }
   }
+
+  async getAllShowTimeByMovieId() {
+    try {
+      const showsByMovie = await db.Movie.findAll(
+        {
+          include: [
+            {
+              model: db.Show,
+              include: [
+                {
+                  model: db.MovieHall,
+                  include: [
+                    {
+                      model: db.Cinema,
+                    },
+                    {
+                      model: db.RoomType,
+                    },
+                    {
+                      model: db.Layout,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        {
+          order: [["createdAt", "ASC"]],
+        }
+      );
+
+      if (!showsByMovie) {
+        return {
+          statusCode: 1,
+          message: "Có lỗi khi getAllShowTimeByMovieId",
+        };
+      }
+
+      return {
+        statusCode: 0,
+        message: "Lấy show thành công",
+        data: showsByMovie,
+      };
+    } catch (error) {
+      return {
+        statusCode: -1,
+        message: "Lỗi trong quá trình lấy dữ liệu getAllShowTimeByMovieId",
+      };
+    }
+  }
 }
 
 export default new movieServices();

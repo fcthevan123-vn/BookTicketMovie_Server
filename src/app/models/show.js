@@ -35,8 +35,8 @@ module.exports = (sequelize, DataTypes) => {
       movieId: DataTypes.UUID,
       date: DataTypes.DATEONLY,
       movieHallId: DataTypes.UUID,
-      startTime: DataTypes.DATE,
-      endTime: DataTypes.DATE,
+      startTime: DataTypes.STRING,
+      endTime: DataTypes.STRING,
     },
     {
       sequelize,
