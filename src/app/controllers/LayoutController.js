@@ -3,7 +3,8 @@ import { layoutServices } from "../../services";
 class LayoutController {
   // Create Layout Controller
   async handleCreateLayout(req, res) {
-    const { name, rows, seatsPerRow } = req.body;
+    const { name, rows, seatsPerRow, normalRows, sweetRows, vipRows } =
+      req.body;
     if (!name || !rows || !seatsPerRow) {
       return res.status(401).json({
         statusCode: 1,
@@ -15,6 +16,9 @@ class LayoutController {
         name,
         rows,
         seatsPerRow,
+        normalRows,
+        sweetRows,
+        vipRows,
       });
       if (response.statusCode === 0) {
         return res.status(200).json(response);

@@ -62,6 +62,10 @@ router.get(
   UserController.handleSearchUser
 );
 
+router.get(
+  "/statistic/register",
+  UserController.handleGetStatisticRegisterUser
+);
 router.get("/statistic", UserController.handleGetStatisticUser);
 
 export default router;

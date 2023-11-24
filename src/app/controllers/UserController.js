@@ -228,6 +228,24 @@ class UserController {
         .json({ message: "Error handleGetStatisticUser", err: error.message });
     }
   }
+
+  async handleGetStatisticRegisterUser(req, res) {
+    try {
+      const response = await userServices.statisticUserRegister();
+      if (response.statusCode === 0) {
+        return res.status(200).json(response);
+      }
+      return res.status(400).json(response);
+    } catch (error) {
+      console.log(error);
+      return res
+        .status(500)
+        .json({
+          message: "Error handleGetStatisticRegisterUser",
+          err: error.message,
+        });
+    }
+  }
 }
 
 export default new UserController();

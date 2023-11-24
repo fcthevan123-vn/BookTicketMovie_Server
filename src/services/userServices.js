@@ -368,6 +368,44 @@ class UserServices {
       };
     }
   }
-}
+  async statisticUserRegister() {
+    try {
+      const data = [];
+      const today = new Date();
+      today.setHours(23, 59, 59, 999);
 
+      for (let i = 0; i < 5; i++) {
+        const weekStart = new Date(today);
+        const weekEnd = new Date(today);
+        weekStart.setDate(today.getDate() - 7 * (i + 1));
+        weekEnd.setDate(today.getDate() - 7 * i);
+
+        const userCount = await db.User.count({
+          where: {
+            createdAt: {
+              [Op.between]: [weekStart, weekEnd],
+            },
+          },
+        });
+
+        data.push({
+          name: `Tuần ${5 - i}`,
+          "Người dùng": userCount,
+        });
+      }
+
+      return {
+        statusCode: 0,
+        message: "Tìm thấy người dùng phù hợp",
+        data: data.reverse(),
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        statusCode: 2,
+        message: "Có lỗi xảy ra khi tìm kiếm người dùng",
+      };
+    }
+  }
+}
 export default new UserServices();

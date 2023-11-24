@@ -1,6 +1,8 @@
 import db from "../app/models";
 import seatServices from "./seatServices";
 import seatStatusServices from "./seatStatusServices";
+// eslint-disable-next-line no-undef
+const { Op } = require("sequelize");
 
 class BookingServices {
   async createBooking(
@@ -69,34 +71,39 @@ class BookingServices {
 
   async getAllBookingsByUserId(userId) {
     try {
-      const allBookings = await db.Booking.findAll({
-        where: {
-          userId: userId,
+      const allBookings = await db.Booking.findAll(
+        {
+          where: {
+            userId: userId,
+          },
+          include: [
+            {
+              model: db.Show,
+              include: [
+                {
+                  model: db.MovieHall,
+                  include: [{ model: db.Cinema }, { model: db.RoomType }],
+                },
+                {
+                  model: db.Movie,
+                },
+              ],
+            },
+            {
+              model: db.SeatStatus,
+              include: [
+                {
+                  model: db.Seat,
+                },
+              ],
+            },
+            { model: db.User, as: "Staff" },
+          ],
         },
-        include: [
-          {
-            model: db.Show,
-            include: [
-              {
-                model: db.MovieHall,
-                include: [{ model: db.Cinema }, { model: db.RoomType }],
-              },
-              {
-                model: db.Movie,
-              },
-            ],
-          },
-          {
-            model: db.SeatStatus,
-            include: [
-              {
-                model: db.Seat,
-              },
-            ],
-          },
-          { model: db.User, as: "Staff" },
-        ],
-      });
+        {
+          order: [["createdAt", "ASC"]],
+        }
+      );
 
       if (!allBookings) {
         return {
@@ -198,6 +205,40 @@ class BookingServices {
         };
       }
 
+      if (status == "Đã huỷ") {
+        const infoBooking = await db.Booking.findOne({
+          where: {
+            id: bookingId,
+          },
+          include: [
+            {
+              model: db.Show,
+              include: [
+                {
+                  model: db.MovieHall,
+                  include: [{ model: db.Cinema }, { model: db.RoomType }],
+                },
+                {
+                  model: db.Movie,
+                },
+              ],
+            },
+            {
+              model: db.SeatStatus,
+              include: [
+                {
+                  model: db.Seat,
+                },
+              ],
+            },
+          ],
+        });
+
+        for (const seatStatus of infoBooking.SeatStatuses) {
+          await seatStatusServices.deleteSeatStatus(seatStatus.id);
+        }
+      }
+
       if (status == "Đã thanh toán") {
         await booking.update({ staffId, status, isPaid: true });
       } else {
@@ -221,35 +262,76 @@ class BookingServices {
 
   async getBookingByStatus(status) {
     try {
-      const allBookings = await db.Booking.findAll({
-        where: {
-          status: status,
-        },
-        include: [
+      let allBookings;
+
+      if (status === "Tất cả") {
+        allBookings = await db.Booking.findAll(
           {
-            model: db.Show,
             include: [
               {
-                model: db.MovieHall,
-                include: [{ model: db.Cinema }, { model: db.RoomType }],
+                model: db.Show,
+                include: [
+                  {
+                    model: db.MovieHall,
+                    include: [{ model: db.Cinema }, { model: db.RoomType }],
+                  },
+                  {
+                    model: db.Movie,
+                  },
+                ],
               },
+              { model: db.User },
+              { model: db.User, as: "Staff" }, //staff id
               {
-                model: db.Movie,
+                model: db.SeatStatus,
+                include: [
+                  {
+                    model: db.Seat,
+                  },
+                ],
               },
             ],
           },
-          { model: db.User },
-          { model: db.User, as: "Staff" }, //staff id
           {
-            model: db.SeatStatus,
+            order: [["createdAt", "ASC"]],
+          }
+        );
+      } else {
+        allBookings = await db.Booking.findAll(
+          {
+            where: {
+              status: status,
+            },
             include: [
               {
-                model: db.Seat,
+                model: db.Show,
+                include: [
+                  {
+                    model: db.MovieHall,
+                    include: [{ model: db.Cinema }, { model: db.RoomType }],
+                  },
+                  {
+                    model: db.Movie,
+                  },
+                ],
+              },
+              { model: db.User },
+              { model: db.User, as: "Staff" }, //staff id
+              {
+                model: db.SeatStatus,
+                include: [
+                  {
+                    model: db.Seat,
+                  },
+                ],
               },
             ],
           },
-        ],
-      });
+          {
+            order: [["createdAt", "ASC"]],
+          }
+        );
+      }
 
       if (!allBookings) {
         return {
@@ -269,6 +351,55 @@ class BookingServices {
         error: error.message,
         statusCode: 4,
         message: "Đã có lỗi xảy ra tại getBookingByStatus - BookingServices",
+      };
+    }
+  }
+
+  async statisticBooking() {
+    try {
+      const data = [];
+      const today = new Date();
+      today.setHours(23, 59, 59, 999);
+
+      for (let i = 0; i < 5; i++) {
+        const weekStart = new Date(today);
+        const weekEnd = new Date(today);
+        weekStart.setDate(today.getDate() - 7 * (i + 1));
+        weekEnd.setDate(today.getDate() - 7 * i);
+
+        // const userCount = await db.User.count({
+        //   where: {
+        //     createdAt: {
+        //       [Op.between]: [weekStart, weekEnd],
+        //     },
+        //   },
+        // });
+
+        const bookingCount = await db.Booking.sum("totalPrice", {
+          where: {
+            createdAt: {
+              [Op.between]: [weekStart, weekEnd],
+            },
+            isPaid: true,
+          },
+        });
+
+        data.push({
+          name: `Tuần ${5 - i}`,
+          "Doanh thu": bookingCount ? bookingCount : 0,
+        });
+      }
+
+      return {
+        statusCode: 0,
+        message: "Thành công",
+        data: data.reverse(),
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        statusCode: 2,
+        message: "Có lỗi xảy ra tại statisticBooking",
       };
     }
   }

@@ -6,6 +6,7 @@ const router = express.Router();
 
 // api/v1/booking
 router.post("/create", BookingController.handleCreateBooking);
+router.get("/statistic", BookingController.handleGetStatistic);
 
 router.get("/by-user/:id", BookingController.handleGetBookingsByUserId);
 
