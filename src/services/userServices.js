@@ -241,7 +241,7 @@ class UserServices {
       if (!isComparePassword) {
         return {
           statusCode: 1,
-          message: `Your password not true, please enter the right password`,
+          message: `Mật khẩu không chính xác`,
         };
       }
 
@@ -262,7 +262,7 @@ class UserServices {
         if (userData) {
           return {
             statusCode: 0,
-            message: "Change password successfully",
+            message: "Đổi mật khẩu thành công",
             data: userData,
           };
         }

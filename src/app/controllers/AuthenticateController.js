@@ -80,7 +80,7 @@ class AuthenticateController {
       res.cookie("token", "");
       return res
         .status(200)
-        .json({ statusCode: 0, message: "Logout successfully" });
+        .json({ statusCode: 0, message: "Đăng xuất thành công" });
     } catch (err) {
       return res
         .status(500)

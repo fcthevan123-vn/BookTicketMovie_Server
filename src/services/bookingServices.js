@@ -71,39 +71,36 @@ class BookingServices {
 
   async getAllBookingsByUserId(userId) {
     try {
-      const allBookings = await db.Booking.findAll(
-        {
-          where: {
-            userId: userId,
-          },
-          include: [
-            {
-              model: db.Show,
-              include: [
-                {
-                  model: db.MovieHall,
-                  include: [{ model: db.Cinema }, { model: db.RoomType }],
-                },
-                {
-                  model: db.Movie,
-                },
-              ],
-            },
-            {
-              model: db.SeatStatus,
-              include: [
-                {
-                  model: db.Seat,
-                },
-              ],
-            },
-            { model: db.User, as: "Staff" },
-          ],
+      const allBookings = await db.Booking.findAll({
+        where: {
+          userId: userId,
         },
-        {
-          order: [["createdAt", "ASC"]],
-        }
-      );
+        include: [
+          {
+            model: db.Show,
+            include: [
+              {
+                model: db.MovieHall,
+                include: [{ model: db.Cinema }, { model: db.RoomType }],
+              },
+              {
+                model: db.Movie,
+              },
+            ],
+          },
+          {
+            model: db.SeatStatus,
+            include: [
+              {
+                model: db.Seat,
+              },
+            ],
+          },
+          { model: db.User, as: "Staff" },
+        ],
+
+        order: [["createdAt", "DESC"]],
+      });
 
       if (!allBookings) {
         return {
@@ -265,37 +262,33 @@ class BookingServices {
       let allBookings;
 
       if (status === "Tất cả") {
-        allBookings = await db.Booking.findAll(
-          {
-            include: [
-              {
-                model: db.Show,
-                include: [
-                  {
-                    model: db.MovieHall,
-                    include: [{ model: db.Cinema }, { model: db.RoomType }],
-                  },
-                  {
-                    model: db.Movie,
-                  },
-                ],
-              },
-              { model: db.User },
-              { model: db.User, as: "Staff" }, //staff id
-              {
-                model: db.SeatStatus,
-                include: [
-                  {
-                    model: db.Seat,
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            order: [["createdAt", "ASC"]],
-          }
-        );
+        allBookings = await db.Booking.findAll({
+          include: [
+            {
+              model: db.Show,
+              include: [
+                {
+                  model: db.MovieHall,
+                  include: [{ model: db.Cinema }, { model: db.RoomType }],
+                },
+                {
+                  model: db.Movie,
+                },
+              ],
+            },
+            { model: db.User },
+            { model: db.User, as: "Staff" }, //staff id
+            {
+              model: db.SeatStatus,
+              include: [
+                {
+                  model: db.Seat,
+                },
+              ],
+            },
+          ],
+          order: [["createdAt", "DESC"]],
+        });
       } else {
         allBookings = await db.Booking.findAll(
           {
@@ -316,7 +309,7 @@ class BookingServices {
                 ],
               },
               { model: db.User },
-              { model: db.User, as: "Staff" }, //staff id
+              { model: db.User, as: "Staff" },
               {
                 model: db.SeatStatus,
                 include: [
