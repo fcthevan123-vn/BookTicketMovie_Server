@@ -8,6 +8,7 @@ import connectDb from "./config/db";
 import { handleError } from "./middleWares";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import sendVerificationEmail from "./middleWares/nodeMailer";
 
 dotenv.config();
 

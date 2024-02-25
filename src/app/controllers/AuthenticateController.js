@@ -7,7 +7,7 @@ class AuthenticateController {
     if (!email || !password) {
       return res.status(401).json({
         statusCode: 1,
-        message: "Missing password or email ",
+        message: "Thiếu địa chỉ email hoặc mật khẩu",
       });
     }
 
@@ -50,7 +50,7 @@ class AuthenticateController {
       console.log(error);
       return res
         .status(500)
-        .json({ message: "Error at handleLogin", err: error.message });
+        .json({ message: "Có lỗi tại đăng nhập", err: error.message });
     }
   }
 
@@ -59,7 +59,7 @@ class AuthenticateController {
     if (!id) {
       return res.status(400).json({
         statusCode: 1,
-        message: "Missing email or userId ",
+        message: "Thiếu id người dùng",
       });
     }
     try {
@@ -85,6 +85,54 @@ class AuthenticateController {
       return res
         .status(500)
         .json({ message: "Error logout.", err: err.message });
+    }
+  }
+
+  async handleVerifyEmail(req, res, next) {
+    const { id } = req.params;
+    console.log("first", id);
+    if (!id) {
+      return res.status(400).json({
+        statusCode: 1,
+        message: "Thiếu id người dùng",
+      });
+    }
+    try {
+      const response = await authenticateServices.verifyEmail({ id });
+      if (response.statusCode === 0) {
+        return res.status(200).json(response);
+      }
+      return res.status(400).json(response);
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ message: "Có lỗi tại handleVerifyEmail", err: error.message });
+    }
+  }
+
+  async handleConfirmEmail(req, res, next) {
+    const { id } = req.params;
+    const { user } = req.query;
+
+    if (!id && !user) {
+      return res.status(400).json({
+        statusCode: 1,
+        message: "Thiếu id người dùng",
+      });
+    }
+    try {
+      const response = await authenticateServices.confirmEmail({
+        token: id,
+        id: user,
+      });
+      if (response.statusCode === 0) {
+        return res.status(200).json(response);
+      }
+      return res.status(400).json(response);
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ message: "Có lỗi tại handleConfirmEmail", err: error.message });
     }
   }
 }

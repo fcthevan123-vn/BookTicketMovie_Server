@@ -35,6 +35,10 @@ module.exports = {
       age: {
         type: Sequelize.INTEGER,
       },
+      tokenVerify: {
+        defaultValue: Sequelize.UUIDV4,
+        type: Sequelize.UUID,
+      },
       count: {
         defaultValue: 0,
         type: Sequelize.INTEGER,

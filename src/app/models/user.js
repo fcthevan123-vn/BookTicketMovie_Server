@@ -35,6 +35,10 @@ module.exports = (sequelize, DataTypes) => {
       count: DataTypes.INTEGER,
       sex: DataTypes.INTEGER,
       age: DataTypes.INTEGER,
+      tokenVerify: {
+        type: DataTypes.STRING,
+        defaultValue: DataTypes.UUIDV4,
+      },
       type: DataTypes.STRING,
     },
     {

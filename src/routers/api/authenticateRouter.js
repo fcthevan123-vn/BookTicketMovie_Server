@@ -14,4 +14,8 @@ router.get(
 
 router.post("/logout", authorizationToken, AuthenticateController.handleLogout);
 
+router.post("/verify-email/:id", AuthenticateController.handleVerifyEmail);
+
+router.post("/confirm-email/:id", AuthenticateController.handleConfirmEmail);
+
 export default router;
