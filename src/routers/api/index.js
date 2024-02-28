@@ -8,6 +8,7 @@ import layoutRouter from "./layoutRouter";
 import showRouter from "./showRouter";
 import seatRouter from "./seatRouter";
 import bookingRouter from "./bookingRouter";
+import reviewRouter from "./reviewRouter";
 
 import express from "express";
 const router = express.Router();
@@ -22,5 +23,6 @@ router.use("/roomType", roomTypeRouter);
 router.use("/layout", layoutRouter);
 router.use("/show", showRouter);
 router.use("/seat", seatRouter);
+router.use("/review", reviewRouter);
 
 export default router;
