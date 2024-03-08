@@ -24,4 +24,10 @@ router.post(
   ReviewController.handleGetReviewOfUserInMovie
 );
 
+// query movieId, userId
+router.get(
+  "/check-user-review",
+  authorizationToken,
+  ReviewController.handleCheckReviewOfUser
+);
 export default router;

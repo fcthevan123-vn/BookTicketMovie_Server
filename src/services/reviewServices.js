@@ -3,6 +3,20 @@ import db from "../app/models";
 class ReviewServices {
   async createReview({ userId, movieId, star, content }) {
     try {
+      const checkReviewExited = await db.Review.findOne({
+        where: {
+          userId: userId,
+        },
+      });
+
+      if (checkReviewExited) {
+        return {
+          statusCode: 2,
+          message:
+            "Bạn đã đánh giá phim này rồi, vui lòng xem đánh giá của bạn và chỉnh sửa nếu muốn.",
+        };
+      }
+
       const reviewDoc = await db.Review.create({
         userId,
         movieId,
@@ -97,6 +111,7 @@ class ReviewServices {
             attributes: ["fullName"],
           },
         ],
+        order: [["createdAt", "DESC"]],
       });
       if (!reviewExisted) {
         return {
@@ -121,8 +136,14 @@ class ReviewServices {
 
   async getReviewOfUserInMovie({ movieId, userId }) {
     try {
-      const reviewExisted = await db.Review.find({
+      const reviewExisted = await db.Review.findAll({
         where: { movieId: movieId, userId: userId },
+        include: [
+          {
+            model: db.User,
+            attributes: ["fullName"],
+          },
+        ],
       });
       if (!reviewExisted) {
         return {
@@ -137,9 +158,51 @@ class ReviewServices {
         data: reviewExisted,
       };
     } catch (error) {
+      console.log("error", error);
       return {
         statusCode: 2,
         message: "Có lỗi xảy ra khi getReviewOfUserInMovie",
+      };
+    }
+  }
+
+  async checkUserCanReview({ movieId, userId }) {
+    try {
+      const userWatchedMovie = await db.Booking.findOne({
+        where: { userId: userId },
+        include: [
+          {
+            model: db.Show,
+            include: [
+              {
+                model: db.Movie,
+                where: {
+                  id: movieId,
+                },
+              },
+            ],
+          },
+        ],
+      });
+      if (!userWatchedMovie.Show) {
+        return {
+          statusCode: 0,
+          check: false,
+          message: "Người dùng chưa xem phim này",
+        };
+      }
+
+      return {
+        statusCode: 0,
+        check: true,
+        message: "Người dùng có thể đánh giá",
+        data: userWatchedMovie,
+      };
+    } catch (error) {
+      console.log("error", error);
+      return {
+        statusCode: 2,
+        message: "Có lỗi xảy ra khi checkUserCanReview",
       };
     }
   }
