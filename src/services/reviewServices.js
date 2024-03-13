@@ -166,6 +166,46 @@ class ReviewServices {
     }
   }
 
+  async calculateStar({ movieId }) {
+    try {
+      const reviews = await db.Review.findAll({
+        where: { movieId: movieId },
+        attributes: ["star"],
+      });
+
+      const totalCount = reviews.length;
+      let totalStars = 0;
+      const starCounts = Array(5).fill(0);
+
+      for (const review of reviews) {
+        totalStars += review.star;
+        starCounts[review.star - 1]++;
+      }
+
+      const average = totalCount > 0 ? totalStars / totalCount : 0;
+
+      const counts = starCounts.map((count, index) => ({
+        rating: index + 1,
+        count: count,
+      }));
+
+      return {
+        statusCode: 0,
+        data: {
+          totalCount: totalCount,
+          average,
+          counts,
+        },
+      };
+    } catch (error) {
+      console.error("Có lỗi xảy ra tại calculateStar:", error);
+      return {
+        statusCode: 1,
+        message: "Có lỗi xảy ra tại calculateStar",
+      };
+    }
+  }
+
   async checkUserCanReview({ movieId, userId }) {
     try {
       const userWatchedMovie = await db.Booking.findOne({

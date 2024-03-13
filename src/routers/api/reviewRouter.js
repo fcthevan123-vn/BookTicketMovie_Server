@@ -30,4 +30,7 @@ router.get(
   authorizationToken,
   ReviewController.handleCheckReviewOfUser
 );
+
+// query movieId
+router.get("/calculate-star-rating", ReviewController.handleCalculateStar);
 export default router;
