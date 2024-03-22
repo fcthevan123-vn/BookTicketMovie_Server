@@ -23,6 +23,7 @@ module.exports = {
             "https://show-booking.s3.amazonaws.com/fe9c7f3fb4256acb2f15",
             "https://show-booking.s3.amazonaws.com/f8d4fb583213b8ce33d0",
           ],
+          trailerLink: "https://youtu.be/7LH-TIcPqks?si=bQ_SHzxkEqeQcaxT",
           genre: ["Hành động", "Hài kịch", "Kịch tính"],
           duration: 123,
           ageRequire: 12,
@@ -41,6 +42,7 @@ module.exports = {
           language: "Việt Nam",
           country: "Anh",
           subtitle: "Anh",
+          trailerLink: "https://youtu.be/egkeFvm26pc?si=bFV-KN4oi95rSkKj",
           releaseDate: "2023-11-01 15:03:38+07",
           endDate: "2023-11-29 15:03:38+07",
           images: [
@@ -73,6 +75,7 @@ module.exports = {
             "https://show-booking.s3.amazonaws.com/fe9c7f3fb4256acb2f15",
             "https://show-booking.s3.amazonaws.com/f8d4fb583213b8ce33d0",
           ],
+          trailerLink: "https://youtu.be/IosqnBOkk2I?si=oITgHX1fJ-GtVTWC",
           genre: ["Hành động", "Hài kịch", "Kịch tính"],
           duration: 123,
           ageRequire: 12,

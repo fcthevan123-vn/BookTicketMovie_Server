@@ -17,6 +17,7 @@ class MovieController {
       directors,
       actors,
       genre,
+      trailerLink,
     } = req.body;
     const files = req.files;
 
@@ -59,6 +60,7 @@ class MovieController {
         actors,
         genre,
         imageData,
+        trailerLink,
       });
 
       if (response.statusCode === 0) {
@@ -164,6 +166,7 @@ class MovieController {
       actors,
       genre,
       imagesDelete,
+      trailerLink,
     } = req.body;
     const files = req.files;
     const { id } = req.params;
@@ -204,6 +207,7 @@ class MovieController {
         genre,
         imageData,
         imagesDelete,
+        trailerLink,
       });
 
       if (response.statusCode === 0) {

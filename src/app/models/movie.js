@@ -36,6 +36,7 @@ module.exports = (sequelize, DataTypes) => {
       genre: DataTypes.ARRAY(DataTypes.STRING),
       duration: DataTypes.INTEGER,
       ageRequire: DataTypes.INTEGER,
+      trailerLink: DataTypes.STRING,
       countBooked: {
         type: DataTypes.INTEGER,
         defaultValue: 0,

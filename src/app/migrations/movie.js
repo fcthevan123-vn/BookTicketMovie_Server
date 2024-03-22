@@ -24,6 +24,9 @@ module.exports = {
       language: {
         type: Sequelize.STRING,
       },
+      trailerLink: {
+        type: Sequelize.STRING,
+      },
       country: {
         type: Sequelize.STRING,
       },

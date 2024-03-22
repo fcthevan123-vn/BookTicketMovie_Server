@@ -17,6 +17,7 @@ class movieServices {
     directors,
     actors,
     genre,
+    trailerLink,
     imageData,
   }) {
     try {
@@ -39,6 +40,7 @@ class movieServices {
         subtitle,
         directors,
         actors,
+        trailerLink,
         genre,
         images: imageData,
         countBooked: 0,
@@ -174,6 +176,7 @@ class movieServices {
     actors,
     genre,
     imageData,
+    trailerLink,
     imagesDelete,
   }) {
     try {
@@ -207,6 +210,7 @@ class movieServices {
           country,
           subtitle,
           directors,
+          trailerLink,
           actors,
           genre,
           images: [...imageMerge, ...imageData],
