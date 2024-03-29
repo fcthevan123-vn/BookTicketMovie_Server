@@ -27,10 +27,14 @@ router.post(
 // query movieId, userId
 router.get(
   "/check-user-review",
-  authorizationToken,
+  // authorizationToken,
   ReviewController.handleCheckReviewOfUser
 );
 
 // query movieId
 router.get("/calculate-star-rating", ReviewController.handleCalculateStar);
+
+// query userId
+router.get("/all-user-review", ReviewController.handleGetAllReviewsOfUser);
+
 export default router;

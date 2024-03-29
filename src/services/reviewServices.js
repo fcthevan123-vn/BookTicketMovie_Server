@@ -6,6 +6,7 @@ class ReviewServices {
       const checkReviewExited = await db.Review.findOne({
         where: {
           userId: userId,
+          movieId: movieId,
         },
       });
 
@@ -166,6 +167,37 @@ class ReviewServices {
     }
   }
 
+  async getAllReviewsOfUser({ userId }) {
+    try {
+      const reviewExisted = await db.Review.findAll({
+        where: { userId: userId },
+        include: [
+          {
+            model: db.Movie,
+          },
+        ],
+      });
+      if (!reviewExisted) {
+        return {
+          statusCode: 1,
+          message: "Không tìm thấy đánh giá nào.",
+        };
+      }
+
+      return {
+        statusCode: 0,
+        message: "Lấy đánh giá thành công",
+        data: reviewExisted,
+      };
+    } catch (error) {
+      console.log("error", error);
+      return {
+        statusCode: 2,
+        message: "Có lỗi xảy ra khi getReviewOfUserInMovie",
+      };
+    }
+  }
+
   async calculateStar({ movieId }) {
     try {
       const reviews = await db.Review.findAll({
@@ -208,26 +240,25 @@ class ReviewServices {
 
   async checkUserCanReview({ movieId, userId }) {
     try {
-      const userWatchedMovie = await db.Booking.findOne({
+      const userWatchedMovie = await db.Booking.findAll({
         where: { userId: userId },
         include: [
           {
             model: db.Show,
+            where: { movieId: movieId },
             include: [
               {
                 model: db.Movie,
-                where: {
-                  id: movieId,
-                },
               },
             ],
           },
         ],
       });
-      if (!userWatchedMovie.Show) {
+      if (!userWatchedMovie[0].Show) {
         return {
           statusCode: 0,
           check: false,
+          data: userWatchedMovie,
           message: "Người dùng chưa xem phim này",
         };
       }
@@ -237,6 +268,7 @@ class ReviewServices {
         check: true,
         message: "Người dùng có thể đánh giá",
         data: userWatchedMovie,
+        movieId: movieId,
       };
     } catch (error) {
       console.log("error", error);
