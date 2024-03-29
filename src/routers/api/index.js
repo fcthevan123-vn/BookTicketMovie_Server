@@ -9,6 +9,7 @@ import showRouter from "./showRouter";
 import seatRouter from "./seatRouter";
 import bookingRouter from "./bookingRouter";
 import reviewRouter from "./reviewRouter";
+import paymentRouter from "./paymentRouter";
 
 import express from "express";
 const router = express.Router();
@@ -24,5 +25,6 @@ router.use("/layout", layoutRouter);
 router.use("/show", showRouter);
 router.use("/seat", seatRouter);
 router.use("/review", reviewRouter);
+router.use("/payment", paymentRouter);
 
 export default router;

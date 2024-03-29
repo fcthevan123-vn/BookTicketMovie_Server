@@ -93,6 +93,11 @@ class BookingServices {
             include: [
               {
                 model: db.Seat,
+                include: [
+                  {
+                    model: db.SeatType,
+                  },
+                ],
               },
             ],
           },

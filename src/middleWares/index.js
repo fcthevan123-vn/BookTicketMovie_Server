@@ -66,10 +66,10 @@ export function authorizationAdmin(req, res, next) {
       });
     }
 
-    if (tokenJWT.type != "admin") {
+    if (tokenJWT.type == "user") {
       return res.status(400).json({
         statusCode: 2,
-        message: "Bạn không phải là admin",
+        message: "Bạn không không có quyền để thực hiện hành động này",
       });
     }
 
