@@ -14,4 +14,16 @@ router.post(
   EventController.handleCreateEvent
 );
 
+router.post(
+  "/update/:id",
+  authorizationAdmin,
+  upload.array("images", 1),
+  validateEventInput,
+  EventController.handleUpdateEvent
+);
+
+router.get("/get-all-events", EventController.handleGetAllEvent);
+
+router.delete("/delete-event/:id", EventController.handleDeleteEvent);
+
 export default router;
