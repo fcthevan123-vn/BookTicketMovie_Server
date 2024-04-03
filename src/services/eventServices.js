@@ -173,6 +173,35 @@ class EventServices {
     }
   }
 
+  async getOneEvent(id) {
+    try {
+      const eventDoc = await db.Event.findOne({
+        where: {
+          id: id,
+        },
+      });
+
+      if (eventDoc) {
+        return {
+          statusCode: 0,
+          message: "Lấy đữ liệu thành công",
+          data: eventDoc,
+        };
+      } else {
+        return {
+          statusCode: 2,
+          message: "Lấy dữ liệu thất bại",
+          data: eventDoc,
+        };
+      }
+    } catch (error) {
+      return {
+        statusCode: 1,
+        message: "Lấy đữ liệu thất bại",
+      };
+    }
+  }
+
   async deleteEvent({ id }) {
     try {
       const eventExisted = await db.Event.findOne({ where: { id } });

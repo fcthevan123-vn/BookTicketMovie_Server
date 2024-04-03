@@ -130,6 +130,32 @@ class EventController {
     }
   }
 
+  async handleGetOneEvent(req, res) {
+    try {
+      const { id } = req.params;
+
+      if (!id) {
+        return res.status(401).json({
+          statusCode: 1,
+          message: "Nhập thiếu id",
+        });
+      }
+
+      const response = await eventServices.getOneEvent(id);
+      if (response.statusCode === 0) {
+        return res.status(200).json(response);
+      } else {
+        return res.status(400).json(response);
+      }
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        statusCode: 2,
+        message: "Có lỗi xảy ra tại handleGetOneEvent",
+      });
+    }
+  }
+
   async handleDeleteEvent(req, res) {
     try {
       const { id } = req.params;
