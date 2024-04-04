@@ -1,7 +1,7 @@
 import db from "../app/models";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import sendVerificationEmail from "../middleWares/nodeMailer";
+import { sendVerificationEmail } from "../middleWares/nodeMailer";
 
 const saltRounds = 10;
 const salt = bcrypt.genSaltSync(saltRounds);

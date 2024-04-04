@@ -1,8 +1,87 @@
 import db from "../app/models";
-import seatServices from "./seatServices";
+import {
+  sendEmailAfterUpdateTicketStatus,
+  sendTicketBooked,
+} from "../middleWares/nodeMailer";
 import seatStatusServices from "./seatStatusServices";
 // eslint-disable-next-line no-undef
 const { Op } = require("sequelize");
+
+async function sendEmailToUser(userId) {
+  // send email after user booking successful
+  const userData = await db.User.findOne({
+    where: {
+      id: userId,
+    },
+  });
+
+  if (!userData) {
+    return false;
+  }
+
+  const userTicketLink = `http://127.0.0.1:5173/user/${userId}/all-tickets`;
+
+  sendTicketBooked(userData.email, userTicketLink, userData.fullName);
+
+  return true;
+}
+
+// send email after update ticket status successful
+async function sendEmailUpdateTicketStatus(bookingId) {
+  try {
+    const infoBooking = await db.Booking.findOne({
+      where: {
+        id: bookingId,
+      },
+      include: [
+        {
+          model: db.Show,
+          include: [
+            {
+              model: db.MovieHall,
+              include: [{ model: db.Cinema }, { model: db.RoomType }],
+            },
+            {
+              model: db.Movie,
+            },
+          ],
+        },
+        {
+          model: db.SeatStatus,
+          include: [
+            {
+              model: db.Seat,
+            },
+          ],
+        },
+        {
+          model: db.User,
+        },
+      ],
+    });
+
+    if (!infoBooking) {
+      return false;
+    }
+
+    const seatsName = infoBooking.SeatStatuses.map((item) => {
+      return item.Seat.name;
+    }).join(", ");
+
+    const userTicketLink = `http://127.0.0.1:5173/user/${infoBooking.User.id}/all-tickets`;
+
+    sendEmailAfterUpdateTicketStatus(
+      infoBooking.User.email,
+      userTicketLink,
+      infoBooking,
+      seatsName
+    );
+
+    return true;
+  } catch (error) {
+    console.log("error", error);
+  }
+}
 
 class BookingServices {
   async createBooking(
@@ -52,6 +131,16 @@ class BookingServices {
         if (res.statusCode != 0) {
           return res;
         }
+      }
+
+      const isSentMail = await sendEmailToUser(userId);
+
+      if (!isSentMail) {
+        return {
+          statusCode: 0,
+          message: "Gửi email đến người dùng thất bại",
+          data: bookingDoc,
+        };
       }
 
       return {
@@ -245,6 +334,16 @@ class BookingServices {
         await booking.update({ staffId, status, isPaid: true });
       } else {
         await booking.update({ staffId, status });
+      }
+
+      const isSentEmail = await sendEmailUpdateTicketStatus(bookingId);
+
+      if (!isSentEmail) {
+        return {
+          statusCode: 0,
+          message: "Gửi email tới người dùng thất bại",
+          data: booking,
+        };
       }
 
       return {
