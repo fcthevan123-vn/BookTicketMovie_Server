@@ -533,9 +533,7 @@ class BookingServices {
         const successBooking = await db.Booking.count({
           where: {
             userId,
-            status: {
-              [Op.not]: ["Đã huỷ", "Chờ xác nhận"],
-            },
+            status: "Đã thanh toán",
             createdAt: {
               [Op.between]: [month.start, month.end],
             },
@@ -545,7 +543,9 @@ class BookingServices {
         const pendingBooking = await db.Booking.count({
           where: {
             userId,
-            status: "Chờ xác nhận",
+            status: {
+              [Op.or]: ["Chờ xác nhận", "Đã xác nhận"],
+            },
             createdAt: {
               [Op.between]: [month.start, month.end],
             },
@@ -573,7 +573,43 @@ class BookingServices {
       return {
         statusCode: 0,
         message: "Thành công",
-        months: months,
+        data: stats.reverse(),
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        statusCode: 2,
+        message: "Có lỗi xảy ra tại statisticUserBooking",
+      };
+    }
+  }
+
+  async moneyStatisticUserBooking(userId) {
+    try {
+      let stats = [];
+
+      const months = getLastSixMonths();
+
+      for (const month of months) {
+        const totalMoney = await db.Booking.sum("totalPrice", {
+          where: {
+            userId: userId,
+            status: "Đã thanh toán",
+            createdAt: {
+              [Op.between]: [month.start, month.end],
+            },
+          },
+        });
+
+        stats.push({
+          month: month.monthLabel,
+          totalMoney: totalMoney ? totalMoney : 0,
+        });
+      }
+
+      return {
+        statusCode: 0,
+        message: "Thành công",
         data: stats.reverse(),
       };
     } catch (error) {

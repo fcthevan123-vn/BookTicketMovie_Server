@@ -71,4 +71,9 @@ router.get("/statistic", UserController.handleGetStatisticUser);
 
 router.get("/get-statistic/:id", BookingController.handleGetUserStatistic);
 
+router.get(
+  "/get-money-statistic/:id",
+  BookingController.handleGetUserMoneyStatistic
+);
+
 export default router;
