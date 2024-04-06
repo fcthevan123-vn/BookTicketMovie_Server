@@ -7,6 +7,36 @@ import seatStatusServices from "./seatStatusServices";
 // eslint-disable-next-line no-undef
 const { Op } = require("sequelize");
 
+function getLastSixMonths() {
+  let currentDate = new Date(); // Lấy thời điểm hiện tại
+  let lastSixMonths = [];
+
+  for (let i = 0; i < 6; i++) {
+    let startOfMonth = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth() - i,
+      1
+    );
+
+    let endOfMonth = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth() - i + 1,
+      0
+    );
+    const test = `${startOfMonth.toLocaleString("vi", {
+      month: "long",
+    })}/${startOfMonth.getFullYear("vi", { month: "year" })}`;
+
+    lastSixMonths.push({
+      start: startOfMonth,
+      end: endOfMonth,
+      monthLabel: test,
+    });
+  }
+
+  return lastSixMonths;
+}
+
 async function sendEmailToUser(userId) {
   // send email after user booking successful
   const userData = await db.User.findOne({
@@ -464,14 +494,6 @@ class BookingServices {
         weekStart.setDate(today.getDate() - 7 * (i + 1));
         weekEnd.setDate(today.getDate() - 7 * i);
 
-        // const userCount = await db.User.count({
-        //   where: {
-        //     createdAt: {
-        //       [Op.between]: [weekStart, weekEnd],
-        //     },
-        //   },
-        // });
-
         const bookingCount = await db.Booking.sum("totalPrice", {
           where: {
             createdAt: {
@@ -497,6 +519,68 @@ class BookingServices {
       return {
         statusCode: 2,
         message: "Có lỗi xảy ra tại statisticBooking",
+      };
+    }
+  }
+
+  async statisticUserBooking(userId) {
+    try {
+      let stats = [];
+
+      const months = getLastSixMonths();
+
+      for (const month of months) {
+        const successBooking = await db.Booking.count({
+          where: {
+            userId,
+            status: {
+              [Op.not]: ["Đã huỷ", "Chờ xác nhận"],
+            },
+            createdAt: {
+              [Op.between]: [month.start, month.end],
+            },
+          },
+        });
+
+        const pendingBooking = await db.Booking.count({
+          where: {
+            userId,
+            status: "Chờ xác nhận",
+            createdAt: {
+              [Op.between]: [month.start, month.end],
+            },
+          },
+        });
+
+        const cancelBooking = await db.Booking.count({
+          where: {
+            userId: userId,
+            status: "Đã huỷ",
+            createdAt: {
+              [Op.between]: [month.start, month.end],
+            },
+          },
+        });
+
+        stats.push({
+          month: month.monthLabel,
+          successBooking,
+          pendingBooking,
+          cancelBooking,
+        });
+      }
+
+      return {
+        statusCode: 0,
+        message: "Thành công",
+        months: months,
+        data: stats.reverse(),
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        statusCode: 2,
+        message: "Có lỗi xảy ra tại statisticUserBooking",
       };
     }
   }

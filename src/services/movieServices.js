@@ -90,7 +90,7 @@ class movieServices {
   async getAllMovies({ isCount }) {
     try {
       let movieDoc;
-      if (isCount) {
+      if (isCount == "true") {
         movieDoc = await db.Movie.count();
       } else {
         movieDoc = await db.Movie.findAll();

@@ -80,7 +80,7 @@ class MovieController {
   async handleGetAllMovies(req, res) {
     try {
       const { isCount } = req.query;
-      const response = await movieServices.getAllMovies({ isCount });
+      const response = await movieServices.getAllMovies({ isCount: isCount });
       if (response.statusCode === 0) {
         return res.status(200).json(response);
       } else {

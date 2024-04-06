@@ -1,5 +1,5 @@
 import express from "express";
-import { UserController } from "../../app/controllers";
+import { BookingController, UserController } from "../../app/controllers";
 import { authorizationAdmin, authorizationToken } from "../../middleWares";
 
 const router = express.Router();
@@ -66,6 +66,9 @@ router.get(
   "/statistic/register",
   UserController.handleGetStatisticRegisterUser
 );
+
 router.get("/statistic", UserController.handleGetStatisticUser);
+
+router.get("/get-statistic/:id", BookingController.handleGetUserStatistic);
 
 export default router;
