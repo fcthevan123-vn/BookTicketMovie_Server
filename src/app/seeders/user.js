@@ -1,3 +1,6 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-undef */
+
 "use strict";
 const { v4: uuidv4 } = require("uuid");
 /** @type {import('sequelize-cli').Migration} */
@@ -43,9 +46,9 @@ module.exports = {
           id: "33f3892a-b3dd-4c49-9838-3138797f989f",
           fullName: "Lai The Van",
           email: "fcthevan1@gmail.com",
-          isVerifyEmail: false,
+          isVerifyEmail: true,
           password:
-            "$2b$10$yidev.gxgy3jpO6ZaCTAaes/4TIgHQfNGd8GG0XZPKq1ddLa86JC6",
+            "$2a$10$ieEhcud2wzFjaHFP1QTqFumSDMuV5vZK08mavxKOQL2DJ8G1PKmHO",
           phone: "0399619422",
           address: "Nguyen Thong, An Thoi, Binh Thuy",
           sex: 1,

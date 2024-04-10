@@ -2,29 +2,21 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("Events", {
+    await queryInterface.createTable("Discounts", {
       id: {
         allowNull: false,
         primaryKey: true,
         defaultValue: Sequelize.UUIDV4,
         type: Sequelize.UUID,
       },
-      discountId: {
-        allowNull: true,
-        defaultValue: null,
-        type: Sequelize.UUID,
-      },
-      content: {
+      nameDiscount: {
         type: Sequelize.STRING,
       },
-      discount: {
+      percentDiscount: {
         allowNull: true,
         type: Sequelize.STRING,
       },
-      title: {
-        type: Sequelize.STRING,
-      },
-      thumbnail: {
+      quantity: {
         type: Sequelize.STRING,
       },
       startDate: {
@@ -44,6 +36,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("Events");
+    await queryInterface.dropTable("Discounts");
   },
 };

@@ -19,17 +19,19 @@ function sortObject(obj) {
 
 class PaymentController {
   async createPaymentUrl(req, res) {
-    const dataBooking = req.dataBooking;
+    // const dataBooking = req.dataBooking;
 
-    console.log("dataBooking", dataBooking);
-    if (!(dataBooking && dataBooking.statusCode === 0)) {
-      return res.status(500).json({
-        statusCode: 500,
-        msg: `Đã có lỗi xảy ra vui lòng thử lại.`,
-      });
-    }
+    // console.log("dataBooking", dataBooking);
+    // if (!(dataBooking && dataBooking.statusCode === 0)) {
+    //   return res.status(500).json({
+    //     statusCode: 500,
+    //     msg: `Đã có lỗi xảy ra vui lòng thử lại.`,
+    //   });
+    // }
 
-    const { data } = dataBooking;
+    // const { data } = dataBooking;
+
+    const idTransaction = Math.floor(Math.random() * 123456789);
 
     let date = new Date();
     let createDate = moment(date).format("yyyyMMDDHHmmss");
@@ -58,10 +60,10 @@ class PaymentController {
     vnp_Params["vnp_TmnCode"] = tmnCode;
     vnp_Params["vnp_Locale"] = locale;
     vnp_Params["vnp_CurrCode"] = currCode;
-    vnp_Params["vnp_TxnRef"] = data.id;
-    vnp_Params["vnp_OrderInfo"] = "Thanh toan cho ma GD:" + data.id;
+    vnp_Params["vnp_TxnRef"] = idTransaction;
+    vnp_Params["vnp_OrderInfo"] = "Thanh toan cho ma GD:" + idTransaction;
     vnp_Params["vnp_OrderType"] = "Thanh toan VNPAY";
-    vnp_Params["vnp_Amount"] = data.doctorPrice * 100;
+    vnp_Params["vnp_Amount"] = 12345678;
     vnp_Params["vnp_ReturnUrl"] = returnUrl;
     vnp_Params["vnp_IpAddr"] = ipAddr;
     vnp_Params["vnp_CreateDate"] = createDate;
@@ -86,6 +88,55 @@ class PaymentController {
         url: vnpUrl,
       },
     });
+  }
+
+  async vnpay_return(req, res) {
+    let config = require("config");
+    let querystring = require("qs");
+    let crypto = require("crypto");
+
+    var vnp_Params = req.query;
+    var secureHash = vnp_Params["vnp_SecureHash"];
+
+    delete vnp_Params["vnp_SecureHash"];
+    delete vnp_Params["vnp_SecureHashType"];
+
+    vnp_Params = sortObject(vnp_Params);
+
+    var secretKey = config.get("vnp_HashSecret");
+
+    var signData = querystring.stringify(vnp_Params, { encode: false });
+    var hmac = crypto.createHmac("sha512", secretKey);
+    var signed = hmac.update(new Buffer(signData, "utf-8")).digest("hex");
+    // console.log("signed", signed);
+    if (secureHash === signed) {
+      var orderId = vnp_Params["vnp_TxnRef"];
+      var rspCode = vnp_Params["vnp_ResponseCode"];
+
+      const updateBooking = await userServices.updateStatusBooking({
+        status: "CU2",
+        bookingId: orderId,
+        sendEmail: true,
+      });
+
+      if (updateBooking.statusCode == 0) {
+        return res.status(200).json({
+          statusCode: 200,
+          msg: "Đơn hàng đã được thanh toán thành công.",
+          data: updateBooking.data,
+        });
+      } else {
+        return res.status(updateBooking.statusCode).json({
+          statusCode: updateBooking.statusCode,
+          msg: "Đơn hàng đã bị xóa hoặc không tìm thấy.",
+        });
+      }
+    } else {
+      return res.status(500).json({
+        statusCode: 500,
+        msg: "Đã có lỗi xãy ra. Dữ liệu đã bị thay đổi.",
+      });
+    }
   }
 }
 export default new PaymentController();

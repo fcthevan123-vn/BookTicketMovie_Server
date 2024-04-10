@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-undef */
 "use strict";
 const { v4: uuidv4 } = require("uuid");
 /** @type {import('sequelize-cli').Migration} */
@@ -9,6 +11,7 @@ module.exports = {
         {
           id: "41933121-7deb-43fe-b387-e317868f60e4",
           title: "Spider man",
+          discountId: "b3b717e3-3871-4a20-963b-13190b45f3f6",
           description:
             "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
           directors: ["The Van", "Bui Kiet"],
@@ -35,6 +38,7 @@ module.exports = {
         {
           id: "6900eb5c-44d4-44a7-868d-a2732c7c62cf",
           title: "Người về từ sao hoả",
+          discountId: null,
           description:
             "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
           directors: ["The Van 1", "Bui Kiet 1"],
@@ -61,6 +65,7 @@ module.exports = {
         {
           id: "6900eb5c-44d4-44a7-868d-a2732c7c82cf",
           title: "Phim mới",
+          discountId: null,
           description:
             "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
           directors: ["The Van 1", "Bui Kiet 1"],

@@ -14,6 +14,12 @@ module.exports = (sequelize, DataTypes) => {
       Movie.hasMany(models.Show, {
         foreignKey: "movieId",
       });
+      Movie.hasMany(models.Review, {
+        foreignKey: "movieId",
+      });
+      Movie.belongsTo(models.Discount, {
+        foreignKey: "discountId",
+      });
     }
   }
   Movie.init(
@@ -23,6 +29,7 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
       },
+      discountId: DataTypes.UUID,
       title: DataTypes.STRING,
       description: DataTypes.TEXT,
       directors: DataTypes.ARRAY(DataTypes.STRING),
