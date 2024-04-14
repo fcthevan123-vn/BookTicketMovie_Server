@@ -29,8 +29,8 @@ module.exports = (sequelize, DataTypes) => {
       nameDiscount: DataTypes.STRING,
       percentDiscount: DataTypes.INTEGER,
       quantity: DataTypes.INTEGER,
-      startDate: DataTypes.STRING,
-      endDate: DataTypes.STRING,
+      startDate: DataTypes.DATE,
+      endDate: DataTypes.DATE,
     },
     {
       sequelize,

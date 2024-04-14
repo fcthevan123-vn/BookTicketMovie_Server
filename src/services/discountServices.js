@@ -16,9 +16,7 @@ class DiscountServices {
         };
       }
 
-      const discountDoc = await db.Discount.create({
-        data,
-      });
+      const discountDoc = await db.Discount.create(data);
 
       if (!discountDoc) {
         return {
@@ -30,9 +28,10 @@ class DiscountServices {
       return {
         statusCode: 0,
         message: "Tạo mã giảm giá thành công",
-        data: discountDoc,
+        data: data,
       };
     } catch (error) {
+      console.log("error", error);
       return {
         statusCode: 3,
         message: "Có lỗi xảy ra khi createDiscount",
@@ -55,7 +54,20 @@ class DiscountServices {
         };
       }
 
-      await disCountExisted.update({ data });
+      const checkExistedNameDiscount = await db.Discount.findOne({
+        where: {
+          nameDiscount: data.nameDiscount,
+        },
+      });
+
+      if (checkExistedNameDiscount) {
+        return {
+          statusCode: 3,
+          message: "Tên mã giảm giá đã bị trùng, vui lòng chọn tên khác",
+        };
+      }
+
+      await disCountExisted.update(data);
 
       if (!disCountExisted) {
         return {
@@ -70,9 +82,73 @@ class DiscountServices {
         data: disCountExisted,
       };
     } catch (error) {
+      console.log("error", error);
       return {
-        statusCode: 3,
-        message: "Có lỗi xảy ra khi createDiscount",
+        statusCode: 4,
+        message: "Có lỗi xảy ra khi updateDiscount",
+      };
+    }
+  }
+
+  async getAllDiscount() {
+    try {
+      const discountDoc = await db.Discount.findAll();
+
+      return {
+        statusCode: 0,
+        message: "Thành công",
+        data: discountDoc,
+      };
+    } catch (error) {
+      return {
+        statusCode: 4,
+        message: "Có lỗi xảy ra khi getAllDiscount",
+      };
+    }
+  }
+
+  async getDiscountById(id) {
+    try {
+      const discountDoc = await db.Discount.findByPk(id);
+
+      return {
+        statusCode: 0,
+        message: "Thành công",
+        data: discountDoc,
+      };
+    } catch (error) {
+      return {
+        statusCode: 4,
+        message: "Có lỗi xảy ra khi getDiscountById",
+      };
+    }
+  }
+
+  async deleteDiscount(id) {
+    try {
+      const disCountExisted = await db.Discount.findOne({
+        where: {
+          id: id,
+        },
+      });
+
+      if (!disCountExisted) {
+        return {
+          statusCode: 1,
+          message: "Mã giảm giá không tồn tại",
+        };
+      }
+
+      await disCountExisted.destroy();
+
+      return {
+        statusCode: 0,
+        message: "Xoá mã giảm giá thành công",
+      };
+    } catch (error) {
+      return {
+        statusCode: 4,
+        message: "Có lỗi xảy ra khi deleteDiscount",
       };
     }
   }
