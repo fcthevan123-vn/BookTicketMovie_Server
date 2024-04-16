@@ -1,6 +1,7 @@
 import db from "../app/models";
 import cinemaServices from "./cinemaServices";
-import moment from "moment";
+import { Op } from "sequelize";
+
 class ShowServices {
   async getSeatStatusOfShowsByMovieId(movieId, roomTypeId, date, locationCode) {
     try {
@@ -181,8 +182,48 @@ class ShowServices {
     }
   }
 
-  async createShow({ movieId, date, movieHallId, startTime, endTime }) {
+  async createShow({
+    movieId,
+    date,
+    movieHallId,
+    startTime,
+    endTime,
+    timeCheckStart,
+    timeCheckEnd,
+  }) {
     try {
+      const validateStartTime = await db.Show.findAll({
+        where: {
+          movieHallId: movieHallId,
+          date: date,
+          movieId: movieId,
+          startTime: {
+            [Op.between]: [timeCheckStart, timeCheckEnd],
+          },
+        },
+      });
+
+      const validateEndTime = await db.Show.findAll({
+        where: {
+          movieHallId: movieHallId,
+          date: date,
+          movieId: movieId,
+          endTime: {
+            [Op.between]: [timeCheckStart, timeCheckEnd],
+          },
+        },
+      });
+
+      if (validateStartTime.length > 0 || validateEndTime.length > 0) {
+        return {
+          statusCode: 1,
+          message:
+            "Thời gian bạn chọn đã bị trùng, vui lòng kiểm tra và chọn lại. Lưu ý mỗi suất chiếu trong 1 phòng phải cách nhau 15 phút.",
+          validateStartTime,
+          validateEndTime,
+        };
+      }
+
       const showDoc = db.Show.create({
         movieId: movieId,
         date: date,
@@ -193,8 +234,8 @@ class ShowServices {
 
       if (!showDoc) {
         return {
-          statusCode: 1,
-          message: "Tạo suất chiếu thất bại",
+          statusCode: 2,
+          message: "Đã có lỗi trong quá trình thêm suất chiếu",
         };
       }
 
@@ -203,6 +244,7 @@ class ShowServices {
         message: "Tạo suất chiếu thành công",
       };
     } catch (error) {
+      console.log("error", error);
       return {
         statusCode: -1,
         message: "Lỗi trong quá trình createShow",

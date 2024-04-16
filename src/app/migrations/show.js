@@ -11,11 +11,11 @@ module.exports = {
       },
       startTime: {
         allowNull: false,
-        type: Sequelize.STRING,
+        type: Sequelize.DATE,
       },
       endTime: {
         allowNull: false,
-        type: Sequelize.STRING,
+        type: Sequelize.DATE,
       },
       date: {
         allowNull: false,

@@ -41,10 +41,10 @@ module.exports = {
         type: Sequelize.STRING,
       },
       releaseDate: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
       },
       endDate: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
       },
       images: {
         type: Sequelize.ARRAY(Sequelize.STRING),

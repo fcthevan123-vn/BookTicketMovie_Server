@@ -54,17 +54,19 @@ class DiscountServices {
         };
       }
 
-      const checkExistedNameDiscount = await db.Discount.findOne({
-        where: {
-          nameDiscount: data.nameDiscount,
-        },
-      });
+      if (disCountExisted.nameDiscount != data.nameDiscount) {
+        const checkExistedNameDiscount = await db.Discount.findOne({
+          where: {
+            nameDiscount: data.nameDiscount,
+          },
+        });
 
-      if (checkExistedNameDiscount) {
-        return {
-          statusCode: 3,
-          message: "Tên mã giảm giá đã bị trùng, vui lòng chọn tên khác",
-        };
+        if (checkExistedNameDiscount) {
+          return {
+            statusCode: 3,
+            message: "Tên mã giảm giá đã bị trùng, vui lòng chọn tên khác",
+          };
+        }
       }
 
       await disCountExisted.update(data);

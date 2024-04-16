@@ -1,4 +1,3 @@
-import moment from "moment";
 import { showServices } from "../../services";
 
 class ShowController {
@@ -44,7 +43,15 @@ class ShowController {
   }
 
   async handleCreateShow(req, res) {
-    const { movieId, date, movieHallId, startTime, endTime } = req.body;
+    const {
+      movieId,
+      date,
+      movieHallId,
+      startTime,
+      endTime,
+      timeCheckEnd,
+      timeCheckStart,
+    } = req.body;
     if (!movieId || !movieHallId || !date || !startTime || !endTime) {
       return res.status(401).json({
         statusCode: 1,
@@ -52,20 +59,14 @@ class ShowController {
       });
     }
 
-    // res.status(200).json({
-    //   data: date,
-    //   startTime: startTime,
-    //   endTime: endTime,
-    // });
-
-    console.log("req.body", req.body);
-
     try {
       const response = await showServices.createShow({
         movieId,
         date,
         movieHallId,
         startTime,
+        timeCheckEnd,
+        timeCheckStart,
         endTime,
       });
 
