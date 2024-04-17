@@ -1,4 +1,5 @@
-import db from "../app/models";
+import { Op, where } from "sequelize";
+import db, { sequelize } from "../app/models";
 
 class DiscountServices {
   async createDiscount({ data }) {
@@ -151,6 +152,114 @@ class DiscountServices {
       return {
         statusCode: 4,
         message: "Có lỗi xảy ra khi deleteDiscount",
+      };
+    }
+  }
+
+  async checkValidDiscount(nameDiscount) {
+    try {
+      const currentDate = new Date();
+
+      const discountDoc = await db.Discount.findOne({
+        where: {
+          nameDiscount: nameDiscount,
+          quantity: {
+            [Op.gt]: "0",
+          },
+          startDate: {
+            [Op.lte]: currentDate,
+          },
+          endDate: {
+            [Op.gte]: currentDate,
+          },
+        },
+      });
+
+      if (discountDoc) {
+        return {
+          statusCode: 0,
+          isValid: true,
+          message: "Thành công",
+          data: discountDoc,
+        };
+      }
+
+      return {
+        statusCode: 0,
+        isValid: false,
+        message: "Mã giảm giá không hợp lệ hoặc đã hết lượt sử dụng",
+      };
+    } catch (error) {
+      return {
+        statusCode: 4,
+        message: "Có lỗi xảy ra khi deleteDiscount",
+        error: error.message,
+      };
+    }
+  }
+
+  async decreaseDiscountQuantity(nameDiscount) {
+    try {
+      const discountDoc = await db.Discount.findOne({
+        where: {
+          nameDiscount: nameDiscount,
+        },
+      });
+
+      const decreasetResult = await discountDoc.decrement("quantity", {
+        by: 1,
+      });
+
+      if (!decreasetResult) {
+        return {
+          statusCode: 1,
+          message: "Đã có lỗi xảy ra",
+        };
+      }
+
+      return {
+        statusCode: 0,
+        message: "Thành công",
+        data: decreasetResult,
+      };
+    } catch (error) {
+      console.log("error", error);
+      return {
+        statusCode: 4,
+        message: "Có lỗi xảy ra khi decreaseDiscountQuantity",
+        error: error.message,
+      };
+    }
+  }
+
+  async increaseDiscountQuantity(discountId) {
+    try {
+      const discountDoc = await db.Discount.findOne({
+        where: {
+          id: discountId,
+        },
+      });
+
+      const increasetResult = await discountDoc.increment("quantity", {
+        by: 1,
+      });
+
+      if (!increasetResult) {
+        return {
+          statusCode: 1,
+          message: "Đã có lỗi xảy ra",
+        };
+      }
+
+      return {
+        statusCode: 0,
+        message: "Thành công",
+      };
+    } catch (error) {
+      return {
+        statusCode: 4,
+        message: "Có lỗi xảy ra khi increaseDiscountQuantity",
+        error: error.message,
       };
     }
   }

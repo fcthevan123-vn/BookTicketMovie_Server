@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-undef */
 "use strict";
 const { v4: uuidv4 } = require("uuid");
 /** @type {import('sequelize-cli').Migration} */
@@ -7,20 +9,12 @@ module.exports = {
       "Cinemas",
       [
         {
-          id: "399e049f-345c-4b6a-bca7-cf91abbdb85f",
-          name: "Rạp chiếu CGV",
-          location: ["1", "2", "49"],
-          detailLocation: "Near Park 1",
-          createdAt: "2023-09-16T03:58:44.739Z",
-          updatedAt: "2023-09-16T03:58:44.739Z",
-        },
-        {
-          id: "4f7d6e71-60c1-41e5-8674-534ad93c7f31",
-          name: "Rạp chiếu Lotte",
-          location: ["1", "3", "94"],
-          detailLocation: "Near Park 1",
-          createdAt: "2023-09-16T03:58:44.739Z",
-          updatedAt: "2023-09-16T03:58:44.739Z",
+          id: "6d673084-c26f-4ac0-b7dd-dbc7fcba2e6f",
+          name: "rap phim test",
+          location: ["92", "916", "31149"],
+          detailLocation: "Trung tâm thành phố Cần Thơ",
+          createdAt: "2024-04-16T03:43:00.066Z",
+          updatedAt: "2024-04-16T03:43:00.066Z",
         },
       ],
       {}

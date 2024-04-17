@@ -2,8 +2,15 @@ import { bookingServices } from "../../services";
 
 class BookingController {
   async handleCreateBooking(req, res) {
-    const { userId, paymentMethod, totalPrice, showId, isPaid, seatIds } =
-      req.body;
+    const {
+      userId,
+      paymentMethod,
+      totalPrice,
+      showId,
+      isPaid,
+      seatIds,
+      discount,
+    } = req.body;
 
     if (!userId || !paymentMethod || !totalPrice || !showId || !seatIds) {
       return res.status(401).json({
@@ -18,7 +25,8 @@ class BookingController {
         seatIds,
         totalPrice,
         showId,
-        isPaid
+        isPaid,
+        discount
       );
       if (response.statusCode === 0) {
         return res.status(200).json(response);
@@ -84,7 +92,7 @@ class BookingController {
   async handleUpdateBooking(req, res) {
     const { bookingId, staffId, status } = req.body;
 
-    if (!bookingId || !staffId || !status) {
+    if (!bookingId || !status) {
       return res.status(401).json({
         statusCode: 1,
         message: "Nhập thiếu thông tin",

@@ -1,6 +1,5 @@
 import express from "express";
 import { BookingController } from "../../app/controllers";
-import { authorizationAdmin } from "../../middleWares";
 
 const router = express.Router();
 
@@ -12,11 +11,7 @@ router.get("/by-user/:id", BookingController.handleGetBookingsByUserId);
 
 router.delete("/:id", BookingController.handleDeleteBooking);
 
-router.post(
-  "/update",
-  authorizationAdmin,
-  BookingController.handleUpdateBooking
-);
+router.post("/update", BookingController.handleUpdateBooking);
 
 router.post("/by-status", BookingController.handleGetBookingByStatus);
 

@@ -14,6 +14,9 @@ module.exports = (sequelize, DataTypes) => {
       Discount.hasMany(models.Movie, {
         foreignKey: "discountId",
       });
+      Discount.hasMany(models.Booking, {
+        foreignKey: "discountId",
+      });
       Discount.hasOne(models.Event, {
         foreignKey: "discountId",
       });

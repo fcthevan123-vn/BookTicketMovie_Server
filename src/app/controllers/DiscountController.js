@@ -123,5 +123,27 @@ class DiscountController {
       });
     }
   }
+
+  async handleCheckValidDiscount(req, res) {
+    const { nameDiscount } = req.query;
+    try {
+      if (!nameDiscount) {
+        return res.status(401).json({
+          statusCode: 1,
+          message: "Thiếu id nhập vào",
+        });
+      }
+      const response = await discountServices.checkValidDiscount(nameDiscount);
+      if (response.statusCode == 0) {
+        return res.status(200).json(response);
+      }
+      return res.status(401).json(response);
+    } catch (error) {
+      return res.status(500).json({
+        message: "Có lỗi tại handleCheckValidDiscount",
+        err: error.message,
+      });
+    }
+  }
 }
 export default new DiscountController();

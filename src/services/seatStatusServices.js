@@ -33,7 +33,14 @@ class SeatStatusServices {
 
   async deleteSeatStatus(id) {
     try {
-      const seatStatusDoc = await db.SeatStatus.findByPk(id);
+      const seatStatusDoc = await db.SeatStatus.update(
+        { isBooked: false },
+        {
+          where: {
+            id: id,
+          },
+        }
+      );
 
       if (!seatStatusDoc) {
         return {
@@ -41,8 +48,6 @@ class SeatStatusServices {
           message: "Không tìm thấy SeatStatus",
         };
       }
-
-      await seatStatusDoc.destroy();
 
       return {
         statusCode: 0,
@@ -62,6 +67,7 @@ class SeatStatusServices {
         where: {
           seatId: seatId,
           showId: showId,
+          isBooked: true,
         },
         include: [
           {

@@ -1,3 +1,6 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-undef */
+
 "use strict";
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -14,10 +17,10 @@ module.exports = {
       },
       percentDiscount: {
         allowNull: true,
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
       },
       quantity: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
       },
       startDate: {
         type: Sequelize.DATE,

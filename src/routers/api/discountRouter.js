@@ -38,4 +38,6 @@ router.post(
   DiscountController.handleUpdateDiscount
 );
 
+router.get("/validate-discount", DiscountController.handleCheckValidDiscount);
+
 export default router;

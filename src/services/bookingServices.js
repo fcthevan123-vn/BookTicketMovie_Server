@@ -3,6 +3,7 @@ import {
   sendEmailAfterUpdateTicketStatus,
   sendTicketBooked,
 } from "../middleWares/nodeMailer";
+import discountServices from "./discountServices";
 import seatStatusServices from "./seatStatusServices";
 // eslint-disable-next-line no-undef
 const { Op } = require("sequelize");
@@ -120,9 +121,34 @@ class BookingServices {
     seatIds,
     totalPrice,
     showId,
-    isPaid
+    isPaid,
+    discount
   ) {
     try {
+      const isValidDiscount = await discountServices.checkValidDiscount(
+        discount
+      );
+
+      if (isValidDiscount.isValid == false) {
+        return {
+          statusCode: 6,
+          message: `Mã giảm giá không hợp lệ hoặc hết lượt sử dụng`,
+        };
+      }
+
+      const decreaseDiscount = await discountServices.decreaseDiscountQuantity(
+        discount
+      );
+
+      console.log("decreaseDiscount", decreaseDiscount);
+
+      if (decreaseDiscount.statusCode !== 0) {
+        return {
+          statusCode: 7,
+          message: `Có lỗi xảy ra trong khi sử dụng mã giảm giá`,
+        };
+      }
+
       for (let seatId of seatIds) {
         const checkSeatAvailable = await seatStatusServices.checkSeatStatus(
           seatId,
@@ -143,6 +169,7 @@ class BookingServices {
         totalPrice: totalPrice,
         paymentMethod: paymentMethod,
         isPaid: isPaid,
+        discountId: decreaseDiscount.data.id,
       });
 
       if (!bookingDoc) {
@@ -326,6 +353,14 @@ class BookingServices {
         };
       }
 
+      if (booking.status == "Đã huỷ") {
+        return {
+          statusCode: 2,
+          message: "Vé này đã bị huỷ trước đó, không thể cập nhật",
+        };
+      }
+
+      // delete seat status and increase discount quantity
       if (status == "Đã huỷ") {
         const infoBooking = await db.Booking.findOne({
           where: {
@@ -358,12 +393,28 @@ class BookingServices {
         for (const seatStatus of infoBooking.SeatStatuses) {
           await seatStatusServices.deleteSeatStatus(seatStatus.id);
         }
+
+        if (booking.discountId) {
+          const increaseDiscount =
+            await discountServices.increaseDiscountQuantity(booking.discountId);
+
+          if (increaseDiscount.statusCode !== 0) {
+            return {
+              statusCode: 5,
+              message: "có lỗi trong quá trình xử lý mã giảm giá",
+            };
+          }
+        }
       }
 
       if (status == "Đã thanh toán") {
         await booking.update({ staffId, status, isPaid: true });
       } else {
-        await booking.update({ staffId, status });
+        if (staffId) {
+          await booking.update({ staffId, status });
+        } else {
+          await booking.update({ staffId: null, status });
+        }
       }
 
       const isSentEmail = await sendEmailUpdateTicketStatus(bookingId);

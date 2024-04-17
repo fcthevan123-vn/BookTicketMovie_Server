@@ -19,8 +19,8 @@ module.exports = {
           language: "Việt Nam",
           country: "Anh",
           subtitle: "Anh",
-          releaseDate: "2023-11-01 15:03:38+07",
-          endDate: "2023-11-29 15:03:38+07",
+          releaseDate: "2024-04-01 15:03:38+07",
+          endDate: "2024-04-29 15:03:38+07",
           images: [
             "https://show-booking.s3.amazonaws.com/08bda76b4584ec9e23c6",
             "https://show-booking.s3.amazonaws.com/fe9c7f3fb4256acb2f15",

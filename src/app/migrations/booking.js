@@ -19,6 +19,16 @@ module.exports = {
         defaultValue: Sequelize.UUIDV4,
         type: Sequelize.UUID,
       },
+      discountId: {
+        allowNull: true,
+        defaultValue: null,
+        type: Sequelize.UUID,
+      },
+      note: {
+        allowNull: true,
+        defaultValue: null,
+        type: Sequelize.STRING,
+      },
       showId: {
         allowNull: false,
         defaultValue: Sequelize.UUIDV4,
