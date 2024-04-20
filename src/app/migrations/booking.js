@@ -40,7 +40,7 @@ module.exports = {
       },
       paymentMethod: {
         type: Sequelize.STRING,
-        defaultValue: "Trực tiếp",
+        defaultValue: "direct",
       },
       status: {
         type: Sequelize.STRING,

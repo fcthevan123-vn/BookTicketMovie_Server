@@ -28,4 +28,12 @@ const validateDiscount = [
     .withMessage("Ngày kết thúc không hợp lệ"),
 ];
 
-export { validateDiscount };
+const validatePaymentOnline = [
+  body("userId").notEmpty().withMessage("Thiếu userid"),
+  body("paymentMethod").notEmpty().withMessage("Thiếu paymentMethod"),
+  body("seatIds").notEmpty().withMessage("Thiếu seatIds"),
+  body("totalPrice").notEmpty().withMessage("Thiếu totalPrice"),
+  body("showId").notEmpty().withMessage("Thiếu showId"),
+];
+
+export { validateDiscount, validatePaymentOnline };

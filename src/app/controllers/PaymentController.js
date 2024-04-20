@@ -1,4 +1,65 @@
+import { validationResult } from "express-validator";
 import moment from "moment";
+import { bookingServices } from "../../services";
+import { sendEmailAfterUpdateTicketStatus } from "../../middleWares/nodeMailer";
+import db from "../models";
+
+// send email after update ticket status successful
+async function sendEmailUpdateTicketStatus(bookingId) {
+  try {
+    const infoBooking = await db.Booking.findOne({
+      where: {
+        id: bookingId,
+      },
+      include: [
+        {
+          model: db.Show,
+          include: [
+            {
+              model: db.MovieHall,
+              include: [{ model: db.Cinema }, { model: db.RoomType }],
+            },
+            {
+              model: db.Movie,
+            },
+          ],
+        },
+        {
+          model: db.SeatStatus,
+          include: [
+            {
+              model: db.Seat,
+            },
+          ],
+        },
+        {
+          model: db.User,
+        },
+      ],
+    });
+
+    if (!infoBooking) {
+      return false;
+    }
+
+    const seatsName = infoBooking.SeatStatuses.map((item) => {
+      return item.Seat.name;
+    }).join(", ");
+
+    const userTicketLink = `http://127.0.0.1:5173/user/${infoBooking.User.id}/all-tickets`;
+
+    sendEmailAfterUpdateTicketStatus(
+      infoBooking.User.email,
+      userTicketLink,
+      infoBooking,
+      seatsName
+    );
+
+    return true;
+  } catch (error) {
+    console.log("error", error);
+  }
+}
 
 // sortObject function
 function sortObject(obj) {
@@ -19,19 +80,52 @@ function sortObject(obj) {
 
 class PaymentController {
   async createPaymentUrl(req, res) {
-    // const dataBooking = req.dataBooking;
+    const data = req.body;
 
-    // console.log("dataBooking", dataBooking);
-    // if (!(dataBooking && dataBooking.statusCode === 0)) {
-    //   return res.status(500).json({
-    //     statusCode: 500,
-    //     msg: `Đã có lỗi xảy ra vui lòng thử lại.`,
-    //   });
-    // }
+    const {
+      userId,
+      paymentMethod,
+      seatIds,
+      totalPrice,
+      showId,
+      isPaid,
+      discount,
+      status,
+      sendEmail,
+    } = data;
 
-    // const { data } = dataBooking;
+    const errors = validationResult(req);
 
-    const idTransaction = Math.floor(Math.random() * 123456789);
+    if (!errors.isEmpty()) {
+      return res.status(401).json({
+        statusCode: 1,
+        message: "Dữ liệu đầu vào không hợp lệ",
+        errors: errors.array(),
+      });
+    }
+
+    // create booking
+    const createBooking = await bookingServices.createBooking(
+      userId,
+      paymentMethod,
+      seatIds,
+      totalPrice,
+      showId,
+      isPaid,
+      discount,
+      status,
+      sendEmail
+    );
+
+    if (createBooking.statusCode != 0) {
+      return res.status(401).json({
+        statusCode: 2,
+        message: "Tạo vé xem phim thất bại",
+        errors: createBooking.error,
+      });
+    }
+
+    const idTransaction = createBooking.data.id;
 
     let date = new Date();
     let createDate = moment(date).format("yyyyMMDDHHmmss");
@@ -75,15 +169,18 @@ class PaymentController {
 
     let querystring = require("qs");
     let signData = querystring.stringify(vnp_Params, { encode: false });
+
     let crypto = require("crypto");
+
     let hmac = crypto.createHmac("sha512", secretKey);
     let signed = hmac.update(new Buffer(signData, "utf-8")).digest("hex");
+
     vnp_Params["vnp_SecureHash"] = signed;
     vnpUrl += "?" + querystring.stringify(vnp_Params, { encode: false });
 
     return res.status(200).json({
-      statusCode: 200,
-      msg: "Đã tạo thanh toán",
+      statusCode: 0,
+      message: "Đã tạo thanh toán",
       data: {
         url: vnpUrl,
       },
@@ -96,6 +193,7 @@ class PaymentController {
     let crypto = require("crypto");
 
     var vnp_Params = req.query;
+    console.log("vnp_Params", vnp_Params);
     var secureHash = vnp_Params["vnp_SecureHash"];
 
     delete vnp_Params["vnp_SecureHash"];
@@ -108,33 +206,70 @@ class PaymentController {
     var signData = querystring.stringify(vnp_Params, { encode: false });
     var hmac = crypto.createHmac("sha512", secretKey);
     var signed = hmac.update(new Buffer(signData, "utf-8")).digest("hex");
-    // console.log("signed", signed);
-    if (secureHash === signed) {
-      var orderId = vnp_Params["vnp_TxnRef"];
+
+    const bookingId = vnp_Params["vnp_TxnRef"];
+
+    if (secureHash == signed) {
       var rspCode = vnp_Params["vnp_ResponseCode"];
 
-      const updateBooking = await userServices.updateStatusBooking({
-        status: "CU2",
-        bookingId: orderId,
-        sendEmail: true,
-      });
+      const getBookingInfo = await bookingServices.getBookingById(bookingId);
 
-      if (updateBooking.statusCode == 0) {
+      if (getBookingInfo.statusCode != 0) {
+        return res.status(401).json(getBookingInfo);
+      }
+
+      if (rspCode != "00") {
+        const cancelBooking = await bookingServices.updateBookingByStaff(
+          bookingId,
+          null,
+          "Đã huỷ"
+        );
+        if (cancelBooking.statusCode != 0) {
+          return res.status(401).json(cancelBooking);
+        }
+
         return res.status(200).json({
-          statusCode: 200,
-          msg: "Đơn hàng đã được thanh toán thành công.",
-          data: updateBooking.data,
-        });
-      } else {
-        return res.status(updateBooking.statusCode).json({
-          statusCode: updateBooking.statusCode,
-          msg: "Đơn hàng đã bị xóa hoặc không tìm thấy.",
+          statusCode: 1,
+          message: "Thanh toán thất bại, vui lòng thanh toán lại",
         });
       }
+
+      const confirmBooking = await bookingServices.updateBookingByStaff(
+        bookingId,
+        null,
+        "Đã thanh toán"
+      );
+      if (confirmBooking.statusCode != 0) {
+        return res.status(401).json(confirmBooking);
+      }
+
+      const isSentEmail = await sendEmailUpdateTicketStatus(bookingId);
+
+      if (!isSentEmail) {
+        return res.status(401).json({
+          statusCode: 1,
+          message: "Gửi email tới người dùng thất bại",
+        });
+      }
+
+      return res.status(200).json({
+        statusCode: 0,
+        message: "Thanh toán đơn đặt vé thành công",
+        data: getBookingInfo.data,
+      });
     } else {
+      const cancelBooking = await bookingServices.updateBookingByStaff(
+        bookingId,
+        null,
+        "Đã huỷ"
+      );
+      if (cancelBooking.statusCode != 0) {
+        return res.status(401).json(cancelBooking);
+      }
       return res.status(500).json({
-        statusCode: 500,
-        msg: "Đã có lỗi xãy ra. Dữ liệu đã bị thay đổi.",
+        statusCode: 2,
+        message:
+          "Thanh toán không thành công do giao dịch đã bị huỷ hoặc gặp lỗi",
       });
     }
   }

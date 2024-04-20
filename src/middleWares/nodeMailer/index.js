@@ -1,4 +1,5 @@
 /* eslint-disable no-undef */
+import moment from "moment";
 import { createTransport } from "nodemailer";
 const dotenv = require("dotenv");
 dotenv.config();
@@ -7,8 +8,8 @@ dotenv.config();
 const transporter = createTransport({
   service: "Gmail",
   auth: {
-    user: process.env.MAIL_ACCOUNT, // Replace with your Gmail email address
-    pass: process.env.MAIL_PASSWORD, // Replace with your Gmail password
+    user: process.env.MAIL_ACCOUNT,
+    pass: process.env.MAIL_PASSWORD,
   },
 });
 
@@ -76,23 +77,40 @@ export const sendEmailAfterUpdateTicketStatus = (
   const mailOptions = {
     from: process.env.MAIL_ACCOUNT,
     to: email,
-    subject: "Cập nhật trạng thái đặt vé",
-    html: `<body style="font-family: Arial, sans-serif;background-color: #f5f5f5;margin: 0;padding: 0;">
+    subject: `Cập nhật trạng thái đặt vé - ${dataTicket.status}`,
+    html: `<body style="font-family: Arial, sans-serif;margin: 0;padding: 0;">
     <div class="container" style="width: 80%;margin: 25px auto;background-color: #fff;border-radius: 8px;box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);overflow: hidden;">
         <div class="header" style="background-color: #845EF7;color: #fff;padding: 10px;text-align: center;">
             <h1>Thông tin vé xem phim</h1>
         </div>
-        <div class="content" style="padding: 20px;">
+        <div class="content" style="padding: 30px;">
             <div class="movie-info" style="margin-bottom: 30px;border-bottom: 1px solid #ddd;padding-bottom: 20px;">
-                <h2 style="color: #333;font-size: 20px;margin-top: 0;">Tên phim: ${dataTicket.Show.Movie.title}</h2>
-                <p style="margin: 8px 0;">Thời gian: ${dataTicket.Show.startTime} - ${dataTicket.Show.endTime}, ${dataTicket.Show.date}</p>
-                <p style="margin: 8px 0;">Phòng chiếu: ${dataTicket.Show.MovieHall.name}</p>
-                <p style="margin: 8px 0;">Trạng thái vé: <span class="bold" style="font-weight: bold;color: #845EF7;">${dataTicket.status}</span></p>
+                <h2 style="color: #333;font-size: 20px;margin-top: 0;">Tên phim: ${
+                  dataTicket.Show.Movie.title
+                }</h2>
+                <p style="margin: 8px 0;">Thời gian: ${moment(
+                  dataTicket.Show.startTime
+                ).format("hh:mm DD/MM/YYYY")} - ${moment(
+      dataTicket.Show.endTime
+    ).format("hh:mm DD/MM/YYYY")},
+                <p style="margin: 8px 0;">Phòng chiếu: ${
+                  dataTicket.Show.MovieHall.name
+                }</p>
+                <p style="margin: 8px 0;">Trạng thái vé: <span class="bold" style="font-weight: bold;color: #845EF7;">${
+                  dataTicket.status
+                }</span></p>
             </div>
-            <div class="ticket-details" style="padding: 5px 18px;">
+            <div class="ticket-details" style="padding: 5 px 0px;">
                 <h3 style="color: #845EF7;margin-top: 0;">Thông tin vé:</h3>
                 <p style="margin: 5px 0;font-size: 16px;"><span class="bold" style="font-weight: bold;color: #333;">Số ghế:</span> ${seatsName}</p>
-                <p style="margin: 5px 0;font-size: 16px;"><span class="bold" style="font-weight: bold;color: #333;">Tổng tiền:</span> ${dataTicket.totalPrice} VND</p>
+                <p style="margin: 5px 0;font-size: 16px;"><span class="bold" style="font-weight: bold;color: #333;">Tổng tiền:</span> ${
+                  dataTicket.totalPrice
+                } VND</p>
+                 <p style="margin: 5px 0;font-size: 16px;"><span class="bold" style="font-weight: bold;color: #333;">Phương thức thanh toán:</span> ${
+                   dataTicket.paymentMethod == "direct"
+                     ? "Trực tiếp"
+                     : "Online - VNPay"
+                 } VND</p>
                 <!-- Các thông tin khác có thể thêm vào ở đây -->
             </div>
         </div>

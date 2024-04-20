@@ -122,31 +122,35 @@ class BookingServices {
     totalPrice,
     showId,
     isPaid,
-    discount
+    discount,
+    status,
+    sendEmail
   ) {
     try {
-      const isValidDiscount = await discountServices.checkValidDiscount(
-        discount
-      );
+      let discountId = null;
+      if (discount) {
+        const isValidDiscount = await discountServices.checkValidDiscount(
+          discount
+        );
 
-      if (isValidDiscount.isValid == false) {
-        return {
-          statusCode: 6,
-          message: `Mã giảm giá không hợp lệ hoặc hết lượt sử dụng`,
-        };
-      }
+        if (isValidDiscount.isValid == false) {
+          return {
+            statusCode: 6,
+            message: `Mã giảm giá không hợp lệ hoặc hết lượt sử dụng`,
+          };
+        }
 
-      const decreaseDiscount = await discountServices.decreaseDiscountQuantity(
-        discount
-      );
+        const decreaseDiscount =
+          await discountServices.decreaseDiscountQuantity(discount);
 
-      console.log("decreaseDiscount", decreaseDiscount);
+        if (decreaseDiscount.statusCode !== 0) {
+          return {
+            statusCode: 7,
+            message: `Có lỗi xảy ra trong khi sử dụng mã giảm giá`,
+          };
+        }
 
-      if (decreaseDiscount.statusCode !== 0) {
-        return {
-          statusCode: 7,
-          message: `Có lỗi xảy ra trong khi sử dụng mã giảm giá`,
-        };
+        discountId = decreaseDiscount.data.id;
       }
 
       for (let seatId of seatIds) {
@@ -169,7 +173,8 @@ class BookingServices {
         totalPrice: totalPrice,
         paymentMethod: paymentMethod,
         isPaid: isPaid,
-        discountId: decreaseDiscount.data.id,
+        discountId: discountId,
+        status: status,
       });
 
       if (!bookingDoc) {
@@ -190,14 +195,17 @@ class BookingServices {
         }
       }
 
-      const isSentMail = await sendEmailToUser(userId);
+      // check is send email
+      if (sendEmail) {
+        const isSentMail = await sendEmailToUser(userId);
 
-      if (!isSentMail) {
-        return {
-          statusCode: 0,
-          message: "Gửi email đến người dùng thất bại",
-          data: bookingDoc,
-        };
+        if (!isSentMail) {
+          return {
+            statusCode: 0,
+            message: "Gửi email đến người dùng thất bại",
+            data: bookingDoc,
+          };
+        }
       }
 
       return {
@@ -206,7 +214,7 @@ class BookingServices {
         data: bookingDoc,
       };
     } catch (error) {
-      console.log(error);
+      console.log(error.message);
       return {
         error: error.message,
         statusCode: 3,
@@ -313,18 +321,10 @@ class BookingServices {
         };
       }
 
-      if (infoBooking.status == "Chờ xác nhận") {
-        await infoBooking.destroy();
+      await infoBooking.destroy();
 
-        for (const seatStatus of infoBooking.SeatStatuses) {
-          await seatStatusServices.deleteSeatStatus(seatStatus.id);
-        }
-      } else {
-        return {
-          statusCode: 2,
-          message:
-            "Vé này đã được cập nhật bởi nhân viên, vui lòng tải lại trang và liên hệ với nhân viên để huỷ.",
-        };
+      for (const seatStatus of infoBooking.SeatStatuses) {
+        await seatStatusServices.deleteSeatStatus(seatStatus.id);
       }
 
       return {
@@ -668,6 +668,32 @@ class BookingServices {
       return {
         statusCode: 2,
         message: "Có lỗi xảy ra tại statisticUserBooking",
+      };
+    }
+  }
+
+  async getBookingById(bookingId) {
+    try {
+      const bookingDoc = await db.Booking.findByPk(bookingId);
+
+      if (!bookingDoc) {
+        return {
+          statusCode: 1,
+          message: "Lấy dữ liệu của booking thất bại",
+        };
+      }
+
+      return {
+        statusCode: 0,
+        message: "Thành công",
+        data: bookingDoc,
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        statusCode: 2,
+        message: "Có lỗi xảy ra tại getBookingById",
+        error: error.message,
       };
     }
   }

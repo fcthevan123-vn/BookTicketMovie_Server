@@ -10,6 +10,7 @@ class BookingController {
       isPaid,
       seatIds,
       discount,
+      status,
     } = req.body;
 
     if (!userId || !paymentMethod || !totalPrice || !showId || !seatIds) {
@@ -26,7 +27,8 @@ class BookingController {
         totalPrice,
         showId,
         isPaid,
-        discount
+        discount,
+        status
       );
       if (response.statusCode === 0) {
         return res.status(200).json(response);

@@ -1,5 +1,5 @@
-import { Op, where } from "sequelize";
-import db, { sequelize } from "../app/models";
+import { Op } from "sequelize";
+import db from "../app/models";
 
 class DiscountServices {
   async createDiscount({ data }) {
@@ -254,6 +254,48 @@ class DiscountServices {
       return {
         statusCode: 0,
         message: "Thành công",
+      };
+    } catch (error) {
+      return {
+        statusCode: 4,
+        message: "Có lỗi xảy ra khi increaseDiscountQuantity",
+        error: error.message,
+      };
+    }
+  }
+
+  async applyDiscount(discountId, movies) {
+    try {
+      const discountDoc = await db.Discount.findOne({
+        where: {
+          id: discountId,
+        },
+      });
+
+      if (!discountDoc) {
+        return {
+          statusCode: 1,
+          message: "Không tìm thấy mã giảm giá",
+        };
+      }
+
+      for (const movie of movies) {
+        const movieDoc = await db.Movie.findByPk(movie);
+        if (!movieDoc) {
+          return {
+            statusCode: 2,
+            message: "Có lỗi trong quá trình áp dụng mã giảm giá",
+          };
+        }
+
+        movieDoc.update({
+          discountId: discountId,
+        });
+      }
+
+      return {
+        statusCode: 0,
+        message: "Áp dụng mã giảm giá thành công",
       };
     } catch (error) {
       return {

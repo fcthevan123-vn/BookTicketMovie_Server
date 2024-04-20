@@ -124,6 +124,34 @@ class DiscountController {
     }
   }
 
+  async handleApplyDiscount(req, res) {
+    const { idDiscount, moviesPicked } = req.body;
+
+    if (!idDiscount || !moviesPicked) {
+      return res.status(401).json({
+        statusCode: 1,
+        message: "Dữ liệu đầu vào không hợp lệ",
+      });
+    }
+
+    try {
+      const response = await discountServices.applyDiscount(
+        idDiscount,
+        moviesPicked
+      );
+      if (response.statusCode == 0) {
+        return res.status(200).json(response);
+      }
+      return res.status(401).json(response);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        message: "Có lỗi tại handleApplyDiscount",
+        err: error.message,
+      });
+    }
+  }
+
   async handleCheckValidDiscount(req, res) {
     const { nameDiscount } = req.query;
     try {
