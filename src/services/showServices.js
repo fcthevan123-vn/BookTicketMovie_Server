@@ -182,6 +182,83 @@ class ShowServices {
     }
   }
 
+  async getAllShowInCinema(movieId, date, cinemas) {
+    try {
+      const shows = [];
+
+      for (const cinema of cinemas) {
+        const cinemaShows = [];
+
+        for (const movieHall of cinema.MovieHalls) {
+          const showsByCinema = await db.Show.findAll({
+            where: {
+              movieId: movieId,
+              date: date,
+            },
+            include: [
+              {
+                model: db.MovieHall,
+                where: {
+                  id: movieHall.id,
+                  cinemaId: cinema.id,
+                },
+                include: [
+                  {
+                    model: db.Layout,
+                  },
+                ],
+              },
+            ],
+          });
+
+          for (const show of showsByCinema) {
+            const totalSeats = await db.Seat.count({
+              where: {
+                layoutId: show.MovieHall.Layout.id,
+              },
+            });
+
+            const bookedSeats = await db.SeatStatus.count({
+              where: {
+                showId: show.id,
+                isBooked: true,
+              },
+            });
+
+            const availableSeats = totalSeats - bookedSeats;
+
+            show.dataValues.totalSeats = totalSeats;
+            show.dataValues.bookedSeats = bookedSeats;
+            show.dataValues.availableSeats = availableSeats;
+          }
+
+          cinemaShows.push({
+            movieHall: movieHall,
+            allShows: showsByCinema,
+          });
+        }
+
+        shows.push({
+          cinema: cinema,
+          allShowsMovieHall: cinemaShows,
+        });
+      }
+
+      return {
+        statusCode: 0,
+        message: "Lấy show thành công",
+        data: shows,
+      };
+    } catch (error) {
+      console.error("Error while fetching shows:", error);
+      return {
+        statusCode: -1,
+        message: "Lỗi trong quá trình lấy dữ liệu show",
+        error: error.message,
+      };
+    }
+  }
+
   async createShow({
     movieId,
     date,
@@ -277,6 +354,8 @@ class ShowServices {
       };
     }
   }
+
+  // async getShowByQuery(date, province, district) {}
 }
 
 export default new ShowServices();

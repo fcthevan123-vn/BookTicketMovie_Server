@@ -200,6 +200,14 @@ class ReviewServices {
 
   async calculateStar({ movieId }) {
     try {
+      const movieDoc = await db.Movie.findByPk(movieId);
+      if (!movieDoc) {
+        return {
+          statusCode: 2,
+          message: "Không tìm thấy phim",
+        };
+      }
+
       const reviews = await db.Review.findAll({
         where: { movieId: movieId },
         attributes: ["star"],
@@ -228,6 +236,7 @@ class ReviewServices {
           average,
           counts,
         },
+        movieData: movieDoc,
       };
     } catch (error) {
       console.error("Có lỗi xảy ra tại calculateStar:", error);

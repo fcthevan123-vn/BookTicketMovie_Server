@@ -1,5 +1,6 @@
 import { Op } from "sequelize";
 import db from "../app/models";
+import showServices from "./showServices";
 
 class CinemaServices {
   async createCinema({ name, location, detailLocation }) {
@@ -96,6 +97,119 @@ class CinemaServices {
         data: cinemas,
       };
     } catch (error) {
+      return {
+        statusCode: 2,
+        message: "Có lỗi xảy ra khi lấy danh sách rạp phim",
+      };
+    }
+  }
+
+  async getAllCinemaByQuery(city, district, selectedDate, cinema, movieId) {
+    try {
+      let cinemasHaveShows;
+      if (district == "-1") {
+        cinemasHaveShows = await db.Cinema.findAll(
+          {
+            where: {
+              location: { [Op.contains]: [city] },
+            },
+            include: [
+              {
+                model: db.MovieHall,
+                include: [
+                  {
+                    model: db.Show,
+                    where: {
+                      movieId: movieId,
+                      date: {
+                        [Op.eq]: selectedDate,
+                      },
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            nest: true,
+          }
+        );
+      } else {
+        cinemasHaveShows = await db.Cinema.findAll(
+          {
+            where: {
+              location: { [Op.contains]: [city, district] },
+            },
+            include: [
+              {
+                model: db.MovieHall,
+                include: [
+                  {
+                    model: db.Show,
+                    where: {
+                      movieId: movieId,
+                      date: {
+                        [Op.eq]: selectedDate,
+                      },
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            nest: true,
+          }
+        );
+      }
+
+      const cinemaValid = cinemasHaveShows.filter(
+        (cinema) => cinema.MovieHalls.length > 0
+      );
+
+      const filterCinema = cinemaValid.map((cinema) => ({
+        value: cinema.id,
+        label: cinema.name,
+      }));
+
+      let allShows = [];
+
+      if (cinemaValid.length > 0) {
+        if (cinema == null || cinema == "-1") {
+          allShows = await showServices.getAllShowInCinema(
+            movieId,
+            selectedDate,
+            cinemaValid
+          );
+        } else {
+          const cinemaDoc = await db.Cinema.findOne({
+            where: {
+              id: cinema,
+            },
+            include: [
+              {
+                model: db.MovieHall,
+              },
+            ],
+          });
+
+          allShows = await showServices.getAllShowInCinema(
+            movieId,
+            selectedDate,
+            [cinemaDoc]
+          );
+        }
+      }
+
+      return {
+        statusCode: 0,
+        message: "Lấy danh sách rạp phim thành công",
+        data: filterCinema,
+        cinemaValid,
+        allShows: allShows,
+      };
+    } catch (error) {
+      console.log("errorxxx", error.message);
       return {
         statusCode: 2,
         message: "Có lỗi xảy ra khi lấy danh sách rạp phim",

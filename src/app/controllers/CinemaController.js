@@ -92,6 +92,30 @@ class CinemaController {
     }
   }
 
+  async handleGetAllCinemasByQuery(req, res) {
+    const data = req.body;
+
+    try {
+      const response = await cinemaServices.getAllCinemaByQuery(
+        data.city,
+        data.district,
+        data.selectedDate,
+        data.cinema,
+        data.movieId
+      );
+      if (response.statusCode === 0) {
+        return res.status(200).json(response);
+      }
+      return res.status(400).json(response);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        message: "Có lỗi tại handleGetAllCinemasByQuery",
+        err: error.message,
+      });
+    }
+  }
+
   async handleGetLimitCinemas(req, res) {
     const { page, limit } = req.query;
 

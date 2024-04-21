@@ -21,6 +21,9 @@ module.exports = (sequelize, DataTypes) => {
       MovieHall.belongsTo(models.RoomType, {
         foreignKey: "roomTypeId",
       });
+      MovieHall.hasMany(models.Show, {
+        foreignKey: "movieHallId",
+      });
     }
   }
   MovieHall.init(

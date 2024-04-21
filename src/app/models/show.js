@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
       Show.belongsTo(models.MovieHall, {
         foreignKey: "movieHallId",
       });
-      Show.hasMany(models.Booking, {
+      Show.hasMany(models.SeatStatus, {
         foreignKey: "showId",
       });
     }

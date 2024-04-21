@@ -11,4 +11,6 @@ router.get("/get-all", CinemaController.handleGetAllCinemas);
 
 router.get("/get-limit", CinemaController.handleGetLimitCinemas);
 
+router.post("/cinemas-have-shows", CinemaController.handleGetAllCinemasByQuery);
+
 export default router;
