@@ -52,4 +52,6 @@ router.get("/:id", MovieController.handleGetMovieById);
 
 router.get("/statistic/:id", MovieController.handleGetStatistic);
 
+router.post("/search", MovieController.handleAdvanceSearch);
+
 export default router;

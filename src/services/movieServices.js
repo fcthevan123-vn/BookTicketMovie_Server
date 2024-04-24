@@ -501,6 +501,86 @@ class movieServices {
       };
     }
   }
+
+  async advanceSearch(
+    title,
+    ageRequire,
+    country,
+    genre,
+    subtitle,
+    status,
+    rating,
+    page,
+    limit
+  ) {
+    try {
+      let whereCondition = {
+        title: {
+          [Op.iLike]: `%${title}%`,
+        },
+      };
+
+      if (ageRequire && parseInt(ageRequire) < 18) {
+        whereCondition.ageRequire = {
+          [Op.lt]: 18,
+        };
+      } else if (ageRequire && parseInt(ageRequire) >= 18) {
+        whereCondition.ageRequire = {
+          [Op.gte]: 18,
+        };
+      }
+
+      if (subtitle.length > 0) {
+        whereCondition.subtitle = {
+          [Op.any]: subtitle,
+        };
+      }
+
+      if (country.length > 0) {
+        whereCondition.country = {
+          [Op.any]: country,
+        };
+      }
+
+      const currentDate = new Date();
+
+      if (status == "Phim đang chiếu") {
+        whereCondition.releaseDate = {
+          [Op.lte]: currentDate,
+        };
+      } else if (status == "Phim sắp chiếu") {
+        whereCondition.releaseDate = {
+          [Op.gt]: currentDate,
+        };
+      }
+      console.log("genre", genre);
+      if (genre.length > 0) {
+        whereCondition.genre = {
+          [Op.contains]: genre,
+        };
+      }
+
+      const { count, rows: movieDoc } = await db.Movie.findAndCountAll({
+        offset: (page - 1) * limit,
+        limit: limit,
+        order: [["createdAt", "ASC"]],
+        where: whereCondition,
+      });
+
+      return {
+        statusCode: 0,
+        message: "Lấy dữ liệu thành công",
+        data: movieDoc,
+        rows: count,
+      };
+    } catch (error) {
+      console.log("error.message", error);
+      return {
+        statusCode: -1,
+        message: "Lỗi trong quá trình lấy dữ liệu advanceSearch",
+      };
+    }
+  }
 }
 
 export default new movieServices();
