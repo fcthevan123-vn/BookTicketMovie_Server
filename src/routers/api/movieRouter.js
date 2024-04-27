@@ -13,8 +13,19 @@ router.get("/get-shows", MovieController.handleGetShowByMovie);
 router.post(
   "/create",
   authorizationAdmin,
-  upload.array("images", 6),
-  validateCreateMovie,
+  // upload.array("images", 6),
+  // upload.single("trailerFile"),
+  upload.fields([
+    {
+      name: "images",
+      maxCount: 6,
+    },
+    {
+      name: "trailerFile",
+      maxCount: 1,
+    },
+  ]),
+  // validateCreateMovie,
   MovieController.handleCreateMovie
 );
 
@@ -27,7 +38,16 @@ router.delete(
 router.patch(
   "/edit/:id",
   authorizationAdmin,
-  upload.array("images", 6),
+  upload.fields([
+    {
+      name: "images",
+      maxCount: 6,
+    },
+    {
+      name: "trailerFile",
+      maxCount: 1,
+    },
+  ]),
   validateCreateMovie,
   MovieController.handleEditMovie
 );

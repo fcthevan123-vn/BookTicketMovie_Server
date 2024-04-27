@@ -1,19 +1,38 @@
 import cinemaServices from "../../services/cinemaServices";
+import S3Controller from "./S3Controller";
 
 class CinemaController {
   async handleCreateCinema(req, res) {
-    const { name, location, detailLocation } = req.body;
-    if (!name || !location || !detailLocation) {
+    const { name, location, detailLocation, userId, hotline, status } =
+      req.body;
+    if (!name || !location || !detailLocation || !userId) {
       return res.status(401).json({
         statusCode: 1,
         message: "Nhập thiếu thông tin",
       });
     }
+
+    const file = req.files;
+
     try {
+      let imageLink;
+      if (file.length > 0) {
+        const imgUpload = await S3Controller.handleUploadImages(file);
+        if (imgUpload.statusCode === 0) {
+          imageLink = imgUpload.data;
+        } else {
+          return imgUpload;
+        }
+      }
+
       const response = await cinemaServices.createCinema({
         name,
         location,
         detailLocation,
+        userId,
+        hotline,
+        status,
+        imageLink,
       });
       if (response.statusCode === 0) {
         return res.status(200).json(response);
@@ -137,6 +156,25 @@ class CinemaController {
       return res.status(500).json({
         statusCode: 2,
         message: "Có lỗi xảy ra tại handleGetLimitCinemas",
+      });
+    }
+  }
+
+  async hanldeSearchCinema(req, res) {
+    const { city, district, name } = req.body;
+
+    try {
+      const response = await cinemaServices.searchCinema(city, district, name);
+      if (response.statusCode === 0) {
+        return res.status(200).json(response);
+      } else {
+        return res.status(400).json(response);
+      }
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        statusCode: 2,
+        message: "Có lỗi xảy ra tại hanldeSearchCinema",
       });
     }
   }

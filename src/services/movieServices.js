@@ -178,6 +178,7 @@ class movieServices {
     imageData,
     trailerLink,
     imagesDelete,
+    isUpdateTrailer,
   }) {
     try {
       const movieExisted = await db.Movie.findOne({ where: { id } });
@@ -186,6 +187,23 @@ class movieServices {
           statusCode: 2,
           message: "Phim này không tồn tại",
         };
+
+      // detele old trailer
+      if (isUpdateTrailer == "true") {
+        const convertTrailerLink = movieExisted.trailerLink.substring(
+          movieExisted.trailerLink.lastIndexOf("/") + 1
+        );
+        const deleteOldTrailer = await S3Controller.handleDelteImages([
+          convertTrailerLink,
+        ]);
+
+        if (deleteOldTrailer.statusCode != 0) {
+          return {
+            statusCode: 2,
+            message: "Có lỗi xảy ra khi xoá trailer",
+          };
+        }
+      }
 
       let imageMerge;
 

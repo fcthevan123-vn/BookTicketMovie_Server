@@ -1,7 +1,7 @@
 import db from "../app/models";
 import bcrypt from "bcrypt";
 // eslint-disable-next-line no-undef
-const { Op } = require("sequelize");
+const { Op, where } = require("sequelize");
 
 const saltRounds = 10;
 const salt = bcrypt.genSaltSync(saltRounds);
@@ -404,6 +404,42 @@ class UserServices {
       return {
         statusCode: 2,
         message: "Có lỗi xảy ra khi tìm kiếm người dùng",
+      };
+    }
+  }
+
+  async searchUserByType(type) {
+    try {
+      const userDoc = await db.User.findAll({
+        where: {
+          type: type,
+        },
+      });
+
+      if (!userDoc) {
+        return {
+          statusCode: 1,
+          message: "Có lỗi xảy ra",
+        };
+      }
+
+      const convertData = userDoc.map((user) => {
+        return {
+          value: user.id,
+          label: `${user.fullName} - ${user.email}`,
+        };
+      });
+
+      return {
+        statusCode: 0,
+        message: "Get user thành công",
+        data: userDoc,
+        convertData: convertData,
+      };
+    } catch (error) {
+      return {
+        statusCode: 2,
+        message: "Có lỗi xảy ra tại getAllUserByRule",
       };
     }
   }

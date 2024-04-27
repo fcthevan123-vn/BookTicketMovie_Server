@@ -14,6 +14,9 @@ module.exports = (sequelize, DataTypes) => {
       Cinema.hasMany(models.MovieHall, {
         foreignKey: "cinemaId",
       });
+      Cinema.belongsTo(models.User, {
+        foreignKey: "userId",
+      });
     }
   }
   Cinema.init(
@@ -23,9 +26,16 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
       },
+      userId: DataTypes.UUID,
       name: DataTypes.STRING,
       location: DataTypes.ARRAY(DataTypes.STRING),
       detailLocation: DataTypes.STRING,
+      status: {
+        type: DataTypes.STRING,
+        defaultValue: "open",
+      },
+      image: DataTypes.STRING,
+      hotline: DataTypes.STRING,
     },
     {
       sequelize,

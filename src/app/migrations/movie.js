@@ -56,7 +56,7 @@ module.exports = {
         type: Sequelize.INTEGER,
       },
       ageRequire: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING,
       },
 
       countBooked: {

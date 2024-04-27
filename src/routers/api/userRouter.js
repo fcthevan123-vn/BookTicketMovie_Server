@@ -76,4 +76,6 @@ router.get(
   BookingController.handleGetUserMoneyStatistic
 );
 
+router.get("/search", authorizationAdmin, UserController.handleSearchTypeUser);
+
 export default router;

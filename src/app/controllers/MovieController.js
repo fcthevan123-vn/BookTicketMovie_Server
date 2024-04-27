@@ -17,7 +17,6 @@ class MovieController {
       directors,
       actors,
       genre,
-      trailerLink,
     } = req.body;
     const files = req.files;
 
@@ -31,14 +30,18 @@ class MovieController {
     }
 
     try {
+      const trailerLink = await S3Controller.handleUploadVideo(
+        files.trailerFile[0]
+      );
+
       const checkMovie = await movieServices.checkMovieExist({ title });
       if (checkMovie.statusCode !== 0) {
         return res.status(401).json(checkMovie);
       }
 
       let imageData;
-      if (files.length > 0) {
-        const imgUpload = await S3Controller.handleUploadImages(files);
+      if (files.images.length > 0) {
+        const imgUpload = await S3Controller.handleUploadImages(files.images);
         if (imgUpload.statusCode === 0) {
           imageData = imgUpload.data;
         } else {
@@ -60,7 +63,7 @@ class MovieController {
         actors,
         genre,
         imageData,
-        trailerLink,
+        trailerLink: trailerLink.data,
       });
 
       if (response.statusCode === 0) {
@@ -167,8 +170,11 @@ class MovieController {
       genre,
       imagesDelete,
       trailerLink,
+      isUpdateTrailer,
     } = req.body;
     const files = req.files;
+    console.log("files", files);
+
     const { id } = req.params;
     const errors = validationResult(req);
 
@@ -182,13 +188,31 @@ class MovieController {
 
     try {
       let imageData = [];
-      if (files.length > 0) {
-        const imgUpload = await S3Controller.handleUploadImages(files);
+      if (files.images && files.images.length > 0) {
+        const imgUpload = await S3Controller.handleUploadImages(files.images);
         if (imgUpload.statusCode === 0) {
           imageData = imgUpload.data;
         } else {
           return imgUpload;
         }
+      }
+
+      let trailerLinkNew;
+      if (isUpdateTrailer == "true") {
+        // upload new trailer if updateTrailer is true
+        const uploadTrailer = await S3Controller.handleUploadVideo(
+          files.trailerFile[0]
+        );
+
+        if (uploadTrailer.statusCode != 0) {
+          return res.status(401).json({
+            statusCode: 2,
+            message: "Có lỗi xảy ra tại khi upload trailer",
+          });
+        }
+        trailerLinkNew = uploadTrailer.data;
+      } else {
+        trailerLinkNew = trailerLink;
       }
 
       const response = await movieServices.editMovie({
@@ -207,7 +231,8 @@ class MovieController {
         genre,
         imageData,
         imagesDelete,
-        trailerLink,
+        trailerLink: trailerLinkNew,
+        isUpdateTrailer,
       });
 
       if (response.statusCode === 0) {

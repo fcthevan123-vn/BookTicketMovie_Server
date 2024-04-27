@@ -3,12 +3,42 @@ import db from "../app/models";
 import showServices from "./showServices";
 
 class CinemaServices {
-  async createCinema({ name, location, detailLocation }) {
+  async createCinema({
+    name,
+    location,
+    detailLocation,
+    userId,
+    hotline,
+    status,
+    imageLink,
+  }) {
     try {
+      const checkUserValid = await db.Cinema.findOne({
+        where: {
+          userId: userId,
+        },
+        include: [
+          {
+            model: db.User,
+          },
+        ],
+      });
+
+      if (checkUserValid) {
+        return {
+          statusCode: 1,
+          message: `${checkUserValid.User.fullName} đã quản lý ${checkUserValid.name}, vui lòng chọn người khác`,
+        };
+      }
+
       const cinema = await db.Cinema.create({
         name,
         location,
         detailLocation,
+        userId,
+        hotline,
+        status,
+        image: imageLink[0],
       });
 
       return {
@@ -17,6 +47,7 @@ class CinemaServices {
         data: cinema,
       };
     } catch (error) {
+      console.log("error", error);
       return {
         statusCode: 2,
         message: "Có lỗi xảy ra khi tạo rạp phim",
@@ -252,6 +283,9 @@ class CinemaServices {
         offset: (page - 1) * limit,
         limit: limit,
         order: [["createdAt", "ASC"]],
+        include: {
+          model: db.User,
+        },
       });
       if (cinemaDoc) {
         return {
@@ -262,9 +296,110 @@ class CinemaServices {
         };
       }
     } catch (error) {
+      console.log("error", error);
       return {
         statusCode: 1,
         message: "Đã có lỗi xảy ra khi getLimitCinema",
+      };
+    }
+  }
+
+  async searchCinema(city, district, name) {
+    try {
+      let cinemaDoc;
+      console.log("city", city);
+      if (district == null && city == null) {
+        cinemaDoc = await db.Cinema.findAll({
+          where: {
+            [Op.or]: [
+              {
+                detailLocation: {
+                  [Op.iLike]: `%${name}%`,
+                },
+              },
+              {
+                name: {
+                  [Op.iLike]: `%${name}%`,
+                },
+              },
+            ],
+          },
+          include: [
+            {
+              model: db.User,
+            },
+          ],
+        });
+      } else if (district == null) {
+        cinemaDoc = await db.Cinema.findAll({
+          where: {
+            location: {
+              [Op.contains]: [city],
+            },
+            [Op.or]: [
+              {
+                detailLocation: {
+                  [Op.iLike]: `%${name}%`,
+                },
+              },
+              {
+                name: {
+                  [Op.iLike]: `%${name}%`,
+                },
+              },
+            ],
+          },
+          include: [
+            {
+              model: db.User,
+            },
+          ],
+        });
+      } else {
+        cinemaDoc = await db.Cinema.findAll({
+          where: {
+            location: {
+              [Op.contains]: [city],
+            },
+            [Op.or]: [
+              {
+                detailLocation: {
+                  [Op.iLike]: `%${name}%`,
+                },
+              },
+              {
+                name: {
+                  [Op.iLike]: `%${name}%`,
+                },
+              },
+            ],
+          },
+          include: [
+            {
+              model: db.User,
+            },
+          ],
+        });
+      }
+
+      if (cinemaDoc) {
+        return {
+          statusCode: 0,
+          message: "Lấy dữ liệu thành công",
+          data: cinemaDoc,
+          // filterAfter,
+        };
+      }
+
+      return {
+        statusCode: 1,
+        message: "Lấy dữ liệu thất bại",
+      };
+    } catch (error) {
+      console.log("error", error);
+      return {
+        statusCode: 1,
+        message: "Đã có lỗi xảy ra khi searchCinema",
       };
     }
   }

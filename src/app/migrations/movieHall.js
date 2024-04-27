@@ -15,6 +15,10 @@ module.exports = {
       number: {
         type: Sequelize.INTEGER,
       },
+      status: {
+        type: Sequelize.STRING,
+        defaultValue: "open",
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

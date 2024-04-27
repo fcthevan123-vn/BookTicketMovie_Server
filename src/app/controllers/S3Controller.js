@@ -1,4 +1,3 @@
-import { s3Services } from "../../services";
 import crypto from "crypto";
 import sharp from "sharp";
 import { deleteFile, uploadFile } from "../../services/s3Services";
@@ -7,6 +6,7 @@ function generateFileName(bytes) {
   return crypto.randomBytes(bytes).toString("hex");
 }
 
+// eslint-disable-next-line no-undef
 const urlPrefix = process.env.AWS_S3_URL_PREFIX;
 
 class S3Controller {
@@ -49,6 +49,28 @@ class S3Controller {
       return {
         statusCode: 1,
         message: "Xảy ra lỗi trong quá trình xoá hình ảnh",
+      };
+    }
+  }
+
+  async handleUploadVideo(file) {
+    try {
+      const fileContent = file.buffer;
+
+      const videoName = generateFileName(10);
+      const videoUrl = urlPrefix + videoName;
+      await uploadFile(fileContent, videoName, file.mimetype);
+
+      return {
+        statusCode: 0,
+        message: "Upload video thành công",
+        data: videoUrl,
+      };
+    } catch (error) {
+      console.log("error", error);
+      return {
+        statusCode: 1,
+        message: "Xảy ra lỗi trong quá trình tải lên video",
       };
     }
   }

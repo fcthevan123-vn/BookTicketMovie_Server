@@ -35,6 +35,10 @@ module.exports = (sequelize, DataTypes) => {
       },
       number: DataTypes.INTEGER,
       name: DataTypes.STRING,
+      status: {
+        type: DataTypes.STRING,
+        defaultValue: "open",
+      },
       roomTypeId: DataTypes.UUID,
       cinemaId: DataTypes.UUID,
       layoutId: DataTypes.UUID,

@@ -42,7 +42,7 @@ module.exports = (sequelize, DataTypes) => {
       images: DataTypes.ARRAY(DataTypes.STRING),
       genre: DataTypes.ARRAY(DataTypes.STRING),
       duration: DataTypes.INTEGER,
-      ageRequire: DataTypes.INTEGER,
+      ageRequire: DataTypes.STRING,
       trailerLink: DataTypes.STRING,
       countBooked: {
         type: DataTypes.INTEGER,

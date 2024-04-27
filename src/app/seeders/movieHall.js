@@ -12,6 +12,7 @@ module.exports = {
           id: "f00b2d4f-dc76-4fc3-9142-413be014f973",
           number: 1,
           name: "phòng chiếu Cần Thơ",
+          status: "open",
           roomTypeId: "20309041-b52c-4aaa-9b9e-60278bd6541a",
           cinemaId: "6d673084-c26f-4ac0-b7dd-dbc7fcba2e6f",
           layoutId: "38eb74e4-5ba3-4aa9-9959-2ca225ce9889",
