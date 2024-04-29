@@ -3,17 +3,13 @@ import { roomTypeServices } from "../../services";
 class RoomTypeController {
   // Create RoomType Controller
   async handleCreateRoomType(req, res) {
-    const { priceMultiplier, name } = req.body;
-    if (!priceMultiplier || !name) {
-      return res.status(401).json({
-        statusCode: 1,
-        message: "Nhập thiếu thông tin",
-      });
-    }
+    const { name, priceNormal, priceHoliday, cinemaId } = req.body;
     try {
       const response = await roomTypeServices.createRoomType({
-        priceMultiplier,
         name,
+        priceNormal,
+        priceHoliday,
+        cinemaId,
       });
       if (response.statusCode === 0) {
         return res.status(200).json(response);
@@ -47,8 +43,9 @@ class RoomTypeController {
 
   // Read RoomType Controller
   async handleReadAllRoomType(req, res) {
+    const { staffId } = req.query;
     try {
-      const response = await roomTypeServices.readAllRoomType();
+      const response = await roomTypeServices.getAllRoomType(staffId);
       if (response.statusCode === 0) {
         return res.status(200).json(response);
       }
@@ -63,12 +60,14 @@ class RoomTypeController {
 
   // Update RoomType Controller
   async handleUpdateRoomType(req, res) {
-    const { id } = req.params;
-    const { priceMultiplier, name } = req.body;
+    const { id, name, priceNormal, priceHoliday, cinemaId } = req.body;
     try {
-      const response = await roomTypeServices.updateRoomType(id, {
-        priceMultiplier,
+      const response = await roomTypeServices.updateRoomType({
+        id,
         name,
+        priceNormal,
+        priceHoliday,
+        cinemaId,
       });
       if (response.statusCode === 0) {
         return res.status(200).json(response);
@@ -77,7 +76,7 @@ class RoomTypeController {
     } catch (error) {
       console.log(error);
       return res.status(500).json({
-        message: "Có lỗi tại handleUpdateRoomType",
+        message: "Có lỗi tại handleCreateRoomType",
         err: error.message,
       });
     }

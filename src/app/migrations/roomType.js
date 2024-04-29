@@ -9,8 +9,19 @@ module.exports = {
         defaultValue: Sequelize.UUIDV4,
         type: Sequelize.UUID,
       },
+      cinemaId: {
+        allowNull: false,
+        defaultValue: Sequelize.UUIDV4,
+        type: Sequelize.UUID,
+      },
       name: {
         type: Sequelize.STRING,
+      },
+      priceNormal: {
+        type: Sequelize.ARRAY(Sequelize.INTEGER),
+      },
+      priceHoliday: {
+        type: Sequelize.ARRAY(Sequelize.INTEGER),
       },
       priceMultiplier: {
         type: Sequelize.DECIMAL(10, 2),

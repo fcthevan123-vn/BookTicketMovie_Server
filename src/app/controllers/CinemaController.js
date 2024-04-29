@@ -1,5 +1,4 @@
 import cinemaServices from "../../services/cinemaServices";
-import S3Controller from "./S3Controller";
 
 class CinemaController {
   async handleCreateCinema(req, res) {
@@ -15,16 +14,6 @@ class CinemaController {
     const file = req.files;
 
     try {
-      let imageLink;
-      if (file.length > 0) {
-        const imgUpload = await S3Controller.handleUploadImages(file);
-        if (imgUpload.statusCode === 0) {
-          imageLink = imgUpload.data;
-        } else {
-          return imgUpload;
-        }
-      }
-
       const response = await cinemaServices.createCinema({
         name,
         location,
@@ -32,7 +21,7 @@ class CinemaController {
         userId,
         hotline,
         status,
-        imageLink,
+        file,
       });
       if (response.statusCode === 0) {
         return res.status(200).json(response);
@@ -47,20 +36,19 @@ class CinemaController {
   }
 
   async handleUpdateCinema(req, res) {
-    const { id, name, location, detailLocation } = req.body;
-    if (!id || !name || !location || !detailLocation) {
-      return res.status(401).json({
-        statusCode: 1,
-        message: "Nhập thiếu thông tin",
-      });
-    }
+    const data = req.body;
+
+    console.log("data", data);
+
+    const file = req.files;
+
     try {
-      const response = await cinemaServices.updateCinema({
-        id,
-        name,
-        location,
-        detailLocation,
-      });
+      const response = await cinemaServices.updateCinema(
+        {
+          data,
+        },
+        file
+      );
       if (response.statusCode === 0) {
         return res.status(200).json(response);
       }

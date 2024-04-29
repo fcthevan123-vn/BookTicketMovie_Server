@@ -1,5 +1,35 @@
 import db from "../app/models";
 
+async function checkVadidName(name, cinemaId) {
+  try {
+    const response = await db.MovieHall.findOne({
+      where: {
+        name: name,
+        cinemaId: cinemaId,
+      },
+    });
+
+    console.log("response", response);
+
+    if (response) {
+      return {
+        statusCode: 1,
+        message: "Đã tồn tại tên",
+      };
+    }
+
+    return {
+      statusCode: 0,
+      message: "Tên hợp lệ",
+    };
+  } catch (error) {
+    return {
+      statusCode: -1,
+      message: "Có lỗi xảy ra khi lấy dữ liệu",
+    };
+  }
+}
+
 class MovieHallServices {
   async getAllMovieHall() {
     try {
@@ -31,6 +61,15 @@ class MovieHallServices {
 
   async createMovieHall({ number, name, roomTypeId, cinemaId, layoutId }) {
     try {
+      const checkName = await checkVadidName(name, cinemaId);
+
+      if (checkName.statusCode !== 0) {
+        return {
+          statusCode: 1,
+          message: "Tên phòng chiếu đã tồn tại, vui lòng chọn tên khác",
+        };
+      }
+
       const movieHall = await db.MovieHall.create({
         number,
         name,
@@ -75,7 +114,15 @@ class MovieHallServices {
     }
   }
 
-  async updateMovieHall(id, { number, name, roomTypeId, cinemaId, layoutId }) {
+  async updateMovieHall({
+    id,
+    number,
+    name,
+    roomTypeId,
+    cinemaId,
+    layoutId,
+    status,
+  }) {
     try {
       const movieHall = await db.MovieHall.findByPk(id);
       if (!movieHall) {
@@ -85,7 +132,25 @@ class MovieHallServices {
         };
       }
 
-      await movieHall.update({ number, name, roomTypeId, cinemaId, layoutId });
+      if (name != movieHall.name) {
+        const checkName = await checkVadidName(name, cinemaId);
+
+        if (checkName.statusCode !== 0) {
+          return {
+            statusCode: 1,
+            message: "Tên phòng chiếu đã tồn tại, vui lòng chọn tên khác",
+          };
+        }
+      }
+
+      await movieHall.update({
+        number,
+        name,
+        roomTypeId,
+        cinemaId,
+        layoutId,
+        status,
+      });
 
       return {
         statusCode: 0,
@@ -120,6 +185,53 @@ class MovieHallServices {
       return {
         statusCode: 2,
         message: "Có lỗi xảy ra khi xóa phòng chiếu phim",
+      };
+    }
+  }
+
+  async getAllMovieHallByStaff(staffId) {
+    try {
+      const movieHallByStaff = await db.User.findOne({
+        where: {
+          id: staffId,
+        },
+        include: [
+          {
+            model: db.Cinema,
+            include: [
+              {
+                model: db.MovieHall,
+                include: [
+                  {
+                    model: db.Layout,
+                  },
+                  {
+                    model: db.RoomType,
+                  },
+                ],
+              },
+              {
+                model: db.RoomType,
+              },
+              {
+                model: db.Layout,
+              },
+            ],
+          },
+        ],
+        nest: true,
+      });
+
+      return {
+        statusCode: 0,
+        message: "Thành công",
+        data: movieHallByStaff,
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        statusCode: 0,
+        message: "Có lỗi xảy ra khi lấy dữ liệu",
       };
     }
   }

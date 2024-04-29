@@ -8,24 +8,13 @@ module.exports = {
       [
         {
           id: "20309041-b52c-4aaa-9b9e-60278bd6541a",
-          name: "3D",
+          name: "Mặc định",
+          cinemaId: "6d673084-c26f-4ac0-b7dd-dbc7fcba2e6f",
           priceMultiplier: 1.2,
           createdAt: "2023-09-16T03:58:44.739Z",
           updatedAt: "2023-09-16T03:58:44.739Z",
-        },
-        {
-          id: "db6d5f6e-8d9a-47a1-83ff-d2710b7b9211",
-          name: "4D",
-          priceMultiplier: 1.5,
-          createdAt: "2023-09-16T03:58:44.739Z",
-          updatedAt: "2023-09-16T03:58:44.739Z",
-        },
-        {
-          id: "db6d5f6e-8d9a-47a1-83ff-d2710b7b9222",
-          name: "5D",
-          priceMultiplier: 1.7,
-          createdAt: "2023-09-16T03:58:44.739Z",
-          updatedAt: "2023-09-16T03:58:44.739Z",
+          priceNormal: [50000, 70000, 50000],
+          priceHoliday: [60000, 95000, 70000],
         },
       ],
       {}

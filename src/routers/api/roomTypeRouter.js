@@ -11,6 +11,12 @@ router.post(
   RoomTypeController.handleCreateRoomType
 );
 
+router.post(
+  "/update",
+  authorizationAdmin,
+  RoomTypeController.handleUpdateRoomType
+);
+
 router.get("/get-all", RoomTypeController.handleReadAllRoomType);
 
 router.get("/:id", RoomTypeController.handleReadRoomType);

@@ -17,6 +17,9 @@ module.exports = (sequelize, DataTypes) => {
       Layout.hasMany(models.Seat, {
         foreignKey: "layoutId",
       });
+      Layout.belongsTo(models.Cinema, {
+        foreignKey: "cinemaId",
+      });
     }
   }
   Layout.init(
@@ -26,6 +29,7 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
       },
+      cinemaId: DataTypes.UUID,
       name: DataTypes.STRING,
       rows: DataTypes.INTEGER,
       seatsPerRow: DataTypes.INTEGER,

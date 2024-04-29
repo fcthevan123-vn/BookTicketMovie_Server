@@ -12,9 +12,16 @@ router.post(
   CinemaController.handleCreateCinema
 );
 
-router.get("/get-all", CinemaController.handleGetAllCinemas);
+router.post(
+  "/update",
+  authorizationAdmin,
+  upload.array("image", 1),
+  CinemaController.handleUpdateCinema
+);
 
 router.get("/get-limit", CinemaController.handleGetLimitCinemas);
+
+router.get("/get-all", CinemaController.handleGetAllCinemas);
 
 router.post("/search", CinemaController.hanldeSearchCinema);
 

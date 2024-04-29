@@ -24,7 +24,7 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
       },
       discountId: DataTypes.UUIDV4,
-      content: DataTypes.STRING,
+      content: DataTypes.TEXT,
       discount: DataTypes.STRING,
       title: DataTypes.STRING,
       thumbnail: DataTypes.STRING,

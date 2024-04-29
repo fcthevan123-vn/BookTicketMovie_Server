@@ -9,6 +9,11 @@ module.exports = {
         defaultValue: Sequelize.UUIDV4,
         type: Sequelize.UUID,
       },
+      cinemaId: {
+        allowNull: false,
+        defaultValue: Sequelize.UUIDV4,
+        type: Sequelize.UUID,
+      },
       name: {
         type: Sequelize.STRING,
       },

@@ -36,4 +36,12 @@ const validatePaymentOnline = [
   body("showId").notEmpty().withMessage("Thiếu showId"),
 ];
 
-export { validateDiscount, validatePaymentOnline };
+const validateCinema = [
+  body("userId").notEmpty().withMessage("Thiếu userid"),
+  body("name").notEmpty().withMessage("Thiếu name"),
+  body("detailLocation").notEmpty().withMessage("Thiếu detailLocation"),
+  body("hotline").notEmpty().withMessage("Thiếu hotline"),
+  body("status").notEmpty().withMessage("Thiếu status"),
+];
+
+export { validateDiscount, validatePaymentOnline, validateCinema };

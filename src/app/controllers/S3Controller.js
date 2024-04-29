@@ -35,6 +35,24 @@ class S3Controller {
     }
   }
 
+  async handleDelteImagesFromLink(imgLink) {
+    try {
+      const imgName = imgLink.substring(imgLink.lastIndexOf("/") + 1);
+
+      await deleteFile(imgName);
+
+      return {
+        statusCode: 0,
+        message: "Xoá hình ảnh thành công",
+      };
+    } catch (error) {
+      return {
+        statusCode: 1,
+        message: "Xảy ra lỗi trong quá trình xoá hình ảnh",
+      };
+    }
+  }
+
   async handleDelteImages(imgUrls) {
     try {
       for (let url of imgUrls) {

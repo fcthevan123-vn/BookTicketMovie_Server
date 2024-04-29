@@ -9,14 +9,14 @@ module.exports = {
         {
           id: "e7b000b0-caee-44b1-b52c-634c582c6abd",
           name: "Ghế thường",
-          price: 50000,
+          price: 0,
           createdAt: "2023-09-16T03:58:44.739Z",
           updatedAt: "2023-09-16T03:58:44.739Z",
         },
         {
           id: "6bd9d903-f0da-4a15-a1da-a6666660e1ec",
           name: "Ghế VIP",
-          price: 70000,
+          price: 5000,
           createdAt: "2023-09-16T03:58:44.739Z",
           updatedAt: "2023-09-16T03:58:44.739Z",
         },
@@ -24,7 +24,7 @@ module.exports = {
         {
           id: "b0e7b9df-d4ef-4ecf-a92b-0805c8d57a24",
           name: "Ghế Sweet",
-          price: 80000,
+          price: 15000,
           createdAt: "2023-09-16T03:58:44.739Z",
           updatedAt: "2023-09-16T03:58:44.739Z",
         },

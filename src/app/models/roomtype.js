@@ -14,6 +14,9 @@ module.exports = (sequelize, DataTypes) => {
       RoomType.hasMany(models.MovieHall, {
         foreignKey: "roomTypeId",
       });
+      RoomType.belongsTo(models.Cinema, {
+        foreignKey: "cinemaId",
+      });
     }
   }
   RoomType.init(
@@ -23,8 +26,11 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
       },
+      cinemaId: DataTypes.UUID,
       priceMultiplier: DataTypes.DECIMAL(10, 2),
       name: DataTypes.STRING,
+      priceNormal: DataTypes.ARRAY(DataTypes.INTEGER),
+      priceHoliday: DataTypes.ARRAY(DataTypes.INTEGER),
     },
     {
       sequelize,

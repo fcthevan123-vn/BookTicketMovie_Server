@@ -1,6 +1,32 @@
 import { Op } from "sequelize";
 import db from "../app/models";
 import showServices from "./showServices";
+import { S3Controller } from "../app/controllers";
+
+async function checkValidNameCinema(name, location) {
+  try {
+    const cinemaDoc = await db.Cinema.findOne({
+      where: {
+        name: name,
+        location: location,
+      },
+    });
+
+    if (cinemaDoc) {
+      return {
+        statusCode: 1,
+        message: `Tên rạp chiếu phim đã tồn tại ở địa điểm này`,
+      };
+    }
+
+    return {
+      statusCode: 0,
+      message: `Hợp lệ`,
+    };
+  } catch (error) {
+    console.log("error", error);
+  }
+}
 
 class CinemaServices {
   async createCinema({
@@ -10,9 +36,18 @@ class CinemaServices {
     userId,
     hotline,
     status,
-    imageLink,
+    file,
   }) {
     try {
+      const checkNameCinema = await checkValidNameCinema(name, location);
+
+      if (checkNameCinema.statusCode != 0) {
+        return {
+          statusCode: 3,
+          message: `${name} đã bị trùng tại địa điểm này, vui lòng chọn tên khác`,
+        };
+      }
+
       const checkUserValid = await db.Cinema.findOne({
         where: {
           userId: userId,
@@ -29,6 +64,16 @@ class CinemaServices {
           statusCode: 1,
           message: `${checkUserValid.User.fullName} đã quản lý ${checkUserValid.name}, vui lòng chọn người khác`,
         };
+      }
+
+      let imageLink;
+      if (file.length > 0) {
+        const imgUpload = await S3Controller.handleUploadImages(file);
+        if (imgUpload.statusCode === 0) {
+          imageLink = imgUpload.data;
+        } else {
+          return imgUpload;
+        }
       }
 
       const cinema = await db.Cinema.create({
@@ -55,9 +100,10 @@ class CinemaServices {
     }
   }
 
-  async updateCinema({ id, name, location, detailLocation }) {
+  async updateCinema({ data }, file) {
     try {
-      const cinema = await db.Cinema.findOne({ where: { id } });
+      const cinema = await db.Cinema.findByPk(data.id);
+
       if (!cinema) {
         return {
           statusCode: 1,
@@ -65,10 +111,64 @@ class CinemaServices {
         };
       }
 
-      cinema.name = name;
-      cinema.location = location;
-      cinema.detailLocation = detailLocation;
+      if (data.userId != cinema.userId) {
+        const checkUserValid = await db.Cinema.findOne({
+          where: {
+            userId: data.userId,
+          },
+          include: [
+            {
+              model: db.User,
+            },
+          ],
+        });
+
+        if (checkUserValid) {
+          return {
+            statusCode: 1,
+            message: `${checkUserValid.User.fullName} đã quản lý ${checkUserValid.name}, vui lòng chọn người khác`,
+          };
+        }
+      }
+
+      console.log("cinema.name", cinema.name);
+
+      if (data.name !== cinema.name) {
+        const checkCinemaName = await checkValidNameCinema(
+          data.name,
+          data.location
+        );
+
+        if (checkCinemaName.statusCode != 0) {
+          return {
+            statusCode: 3,
+            message: `${data.name} đã bị trùng tại địa điểm này, vui lòng chọn tên khác`,
+          };
+        }
+      }
+      const imgOld = cinema.image;
+
+      let imageLink;
+      if (file.length > 0) {
+        const imgUpload = await S3Controller.handleUploadImages(file);
+        if (imgUpload.statusCode === 0) {
+          imageLink = imgUpload.data;
+        } else {
+          return imgUpload;
+        }
+      }
+
+      cinema.name = data.name;
+      cinema.location = data.location;
+      cinema.detailLocation = data.detailLocation;
+      cinema.hotline = data.hotline;
+      cinema.status = data.status;
+      cinema.userId = data.userId;
+      cinema.image = imageLink[0];
+
       await cinema.save();
+
+      await S3Controller.handleDelteImagesFromLink(imgOld);
 
       return {
         statusCode: 0,
@@ -76,6 +176,7 @@ class CinemaServices {
         data: cinema,
       };
     } catch (error) {
+      console.log("error", error);
       return {
         statusCode: 2,
         message: "Có lỗi xảy ra khi cập nhật rạp phim",
@@ -307,7 +408,7 @@ class CinemaServices {
   async searchCinema(city, district, name) {
     try {
       let cinemaDoc;
-      console.log("city", city);
+
       if (district == null && city == null) {
         cinemaDoc = await db.Cinema.findAll({
           where: {
@@ -330,7 +431,9 @@ class CinemaServices {
             },
           ],
         });
-      } else if (district == null) {
+      }
+
+      if (district == null) {
         cinemaDoc = await db.Cinema.findAll({
           where: {
             location: {
@@ -359,7 +462,7 @@ class CinemaServices {
         cinemaDoc = await db.Cinema.findAll({
           where: {
             location: {
-              [Op.contains]: [city],
+              [Op.contains]: [city, district],
             },
             [Op.or]: [
               {
