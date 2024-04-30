@@ -506,6 +506,35 @@ class CinemaServices {
       };
     }
   }
+
+  async getCinemaByStaff(staffId) {
+    try {
+      const cinemaDoc = await db.Cinema.findOne({
+        where: {
+          userId: staffId,
+        },
+      });
+
+      if (cinemaDoc) {
+        return {
+          statusCode: 0,
+          message: "Lấy dữ liệu thành công",
+          data: cinemaDoc,
+        };
+      }
+
+      return {
+        statusCode: 1,
+        message: "Không tìm thấy dữ liệu",
+      };
+    } catch (error) {
+      return {
+        statusCode: -1,
+        message: "Đã có lỗi xảy ra khi getCinemaByStaff",
+        error: error.message,
+      };
+    }
+  }
 }
 
 export default new CinemaServices();

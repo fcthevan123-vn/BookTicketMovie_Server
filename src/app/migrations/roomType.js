@@ -20,6 +20,10 @@ module.exports = {
       priceNormal: {
         type: Sequelize.ARRAY(Sequelize.INTEGER),
       },
+      status: {
+        type: Sequelize.STRING,
+        defaultValue: "open",
+      },
       priceHoliday: {
         type: Sequelize.ARRAY(Sequelize.INTEGER),
       },

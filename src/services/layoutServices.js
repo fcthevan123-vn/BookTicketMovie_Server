@@ -1,113 +1,101 @@
+import { where } from "sequelize";
 import db from "../app/models";
+import cinemaServices from "./cinemaServices";
 
-function generateSeatMatrix(
-  rows,
-  seatsPerRow,
-  normalRows,
-  vipRows,
-  sweetRows,
-  seatTypes,
-  layoutId
-) {
+function generateSeatMatrix(seatsPerRow, layout, layoutId) {
   const seatMatrix = [];
   let rowIndex = 1;
+  let count = 1;
 
-  for (let row = 1; row <= rows; row++) {
-    const seatType = determineSeatType(
-      rowIndex,
-      normalRows,
-      vipRows,
-      sweetRows
-    );
-
+  for (const item of layout) {
     for (let seatNumber = 1; seatNumber <= seatsPerRow; seatNumber++) {
-      const seatId = `${String.fromCharCode(64 + row)}${seatNumber}`;
+      if (count > parseInt(item.rows)) {
+        count = 1;
+        break;
+      }
+
+      const seatName = `${String.fromCharCode(64 + rowIndex)}${seatNumber}`;
 
       seatMatrix.push({
-        name: seatId,
-        rowNumber: row,
+        name: seatName,
+        rowNumber: rowIndex,
         seatNumber: seatNumber,
-        seatTypeId: seatTypes[seatType],
+        seatTypeId: item.seatType,
         layoutId: layoutId,
       });
-    }
 
-    rowIndex++;
+      if (seatNumber == seatsPerRow && count <= item.rows) {
+        count++;
+        seatNumber = 0;
+        rowIndex++;
+      }
+    }
   }
 
   return seatMatrix;
 }
 
-function determineSeatType(rowIndex, normalRows, vipRows, sweetRows) {
-  if (rowIndex <= normalRows) {
-    return "normal";
-  } else if (rowIndex <= normalRows + vipRows) {
-    return "vip";
-  } else {
-    return "sweet";
-  }
-}
-
 class LayoutServices {
   // Create Layout
-  async createLayout({
-    name,
-    rows,
-    seatsPerRow,
-    normalRows,
-    sweetRows,
-    vipRows,
-  }) {
+  async createLayout({ layout, name, seatsPerRow, totalRows, staffId }) {
     try {
-      const layout = await db.Layout.create({
-        name,
-        rows,
-        seatsPerRow,
-      });
+      const cinemaDoc = await cinemaServices.getCinemaByStaff(staffId);
 
-      const seatTypes = {
-        normal: "e7b000b0-caee-44b1-b52c-634c582c6abd",
-        vip: "6bd9d903-f0da-4a15-a1da-a6666660e1ec",
-        sweet: "b0e7b9df-d4ef-4ecf-a92b-0805c8d57a24",
-      };
-
-      const seatMatrix = generateSeatMatrix(
-        rows,
-        seatsPerRow,
-        normalRows,
-        vipRows,
-        sweetRows,
-        seatTypes,
-        layout.id
-      );
-
-      for (const seat of seatMatrix) {
-        await db.Seat.create(seat);
+      if (cinemaDoc.statusCode != 0) {
+        return {
+          statusCode: 1,
+          message: cinemaDoc.message,
+        };
       }
 
-      // // Create seats and associate them with the layout
-      // const seats = await db.Seat.bulkCreate(
-      //   seatMatrix.map((seat) => ({
-      //     name: seat.name,
-      //     rowNumber: seat.rowNumber,
-      //     seatNumber: seat.seatNumber,
-      //     seatTypeId: seatTypes[seat.seatTypeId],
-      //     layoutId: layout.id,
-      //   }))
-      // );
+      const checkValidName = await db.Layout.findOne({
+        where: {
+          name: name,
+        },
+      });
+
+      if (checkValidName) {
+        return {
+          statusCode: 1,
+          message: "Tên đã trùng, vui lòng chọn tên khác",
+        };
+      }
+
+      const layoutDoc = await db.Layout.create({
+        name,
+        rows: totalRows,
+        seatsPerRow,
+        status: "open",
+        cinemaId: cinemaDoc.data.id,
+      });
+
+      if (!layoutDoc) {
+        return {
+          statusCode: 1,
+          message: "Có lỗi xảy ra khi tạo layout",
+        };
+      }
+
+      const seatMatrix = generateSeatMatrix(seatsPerRow, layout, layoutDoc.id);
+
+      // for (const seat of seatMatrix) {
+      //   await db.Seat.create(seat);
+      // }
+
+      // Create seats and associate them with the layout
+      const seats = await db.Seat.bulkCreate(seatMatrix);
+
+      if (!seats) {
+        return {
+          statusCode: 1,
+          message: "Tạo layout thất bại",
+        };
+      }
 
       return {
         statusCode: 0,
         message: "Tạo layout và ghế thành công",
-        data: { layout, seatMatrix },
-        dataOrgin: {
-          name,
-          rows,
-          seatsPerRow,
-          normalRows,
-          sweetRows,
-          vipRows,
-        },
+        seatMatrix,
       };
     } catch (error) {
       console.log("error", error);
@@ -138,7 +126,7 @@ class LayoutServices {
     } catch (error) {
       return {
         statusCode: 2,
-        message: "Có lỗi xảy ra khi tìm layout",
+        message: "Có lỗi xảy ra tại readLayout",
       };
     }
   }
@@ -163,7 +151,7 @@ class LayoutServices {
     } catch (error) {
       return {
         statusCode: 2,
-        message: "Có lỗi xảy ra khi tìm layout",
+        message: "Có lỗi xảy ra tại readAllLayout",
       };
     }
   }
@@ -221,6 +209,49 @@ class LayoutServices {
       return {
         statusCode: 2,
         message: "Có lỗi xảy ra khi xóa layout",
+      };
+    }
+  }
+
+  async getAllLayoutByStaff(staffId) {
+    try {
+      const cinemaDoc = await cinemaServices.getCinemaByStaff(staffId);
+
+      if (cinemaDoc.statusCode != 0) {
+        return {
+          statusCode: 1,
+          message: "Không tìm thấy nhân viên",
+        };
+      }
+
+      const layoutDoc = await db.Layout.findAll({
+        where: {
+          cinemaId: cinemaDoc.data.id,
+        },
+        include: [
+          {
+            model: db.Seat,
+            include: [
+              {
+                model: db.SeatType,
+              },
+            ],
+          },
+        ],
+        order: [["createdAt", "DESC"]],
+      });
+
+      return {
+        statusCode: 0,
+        message: "Thành công",
+        data: layoutDoc,
+      };
+    } catch (error) {
+      console.log("error", error);
+      return {
+        statusCode: -1,
+        message: "Có lỗi xảy ra tại getAllLayoutByStaff",
+        error: error.message,
       };
     }
   }

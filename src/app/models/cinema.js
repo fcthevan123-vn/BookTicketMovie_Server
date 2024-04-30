@@ -20,6 +20,12 @@ module.exports = (sequelize, DataTypes) => {
       Cinema.hasMany(models.Layout, {
         foreignKey: "cinemaId",
       });
+      Cinema.hasMany(models.RoomType, {
+        foreignKey: "cinemaId",
+      });
+      Cinema.hasMany(models.SeatType, {
+        foreignKey: "cinemaId",
+      });
       Cinema.belongsTo(models.User, {
         foreignKey: "userId",
       });

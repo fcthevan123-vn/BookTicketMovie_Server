@@ -93,7 +93,9 @@ class movieServices {
       if (isCount == "true") {
         movieDoc = await db.Movie.count();
       } else {
-        movieDoc = await db.Movie.findAll();
+        movieDoc = await db.Movie.findAll({
+          order: [["createdAt", "ASC"]],
+        });
       }
       if (movieDoc) {
         return {
@@ -188,8 +190,10 @@ class movieServices {
           message: "Phim này không tồn tại",
         };
 
+      console.log("trailerLink", trailerLink);
+      const oldTrailerLink = movieExisted.trailerLink;
       // detele old trailer
-      if (isUpdateTrailer == "true") {
+      if (isUpdateTrailer == "true" && movieExisted.trailerLink) {
         const convertTrailerLink = movieExisted.trailerLink.substring(
           movieExisted.trailerLink.lastIndexOf("/") + 1
         );
@@ -228,7 +232,7 @@ class movieServices {
           country,
           subtitle,
           directors,
-          trailerLink,
+          trailerLink: oldTrailerLink,
           actors,
           genre,
           images: [...imageMerge, ...imageData],

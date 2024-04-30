@@ -11,6 +11,7 @@ module.exports = {
         name: "8 x 8",
         cinemaId: "6d673084-c26f-4ac0-b7dd-dbc7fcba2e6f",
         rows: 8,
+        status: "open",
         seatsPerRow: 8,
         createdAt: "2023-09-16T03:58:44.739Z",
         updatedAt: "2023-09-16T03:58:44.739Z",

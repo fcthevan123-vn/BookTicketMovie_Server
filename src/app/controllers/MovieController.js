@@ -173,7 +173,6 @@ class MovieController {
       isUpdateTrailer,
     } = req.body;
     const files = req.files;
-    console.log("files", files);
 
     const { id } = req.params;
     const errors = validationResult(req);
@@ -198,11 +197,14 @@ class MovieController {
       }
 
       let trailerLinkNew;
+      console.log("isUpdateTrailer", isUpdateTrailer);
       if (isUpdateTrailer == "true") {
         // upload new trailer if updateTrailer is true
         const uploadTrailer = await S3Controller.handleUploadVideo(
           files.trailerFile[0]
         );
+
+        console.log("uploadTrailer", uploadTrailer);
 
         if (uploadTrailer.statusCode != 0) {
           return res.status(401).json({

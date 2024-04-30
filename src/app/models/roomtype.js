@@ -26,6 +26,10 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
       },
+      status: {
+        type: DataTypes.STRING,
+        defaultValue: "open",
+      },
       cinemaId: DataTypes.UUID,
       priceMultiplier: DataTypes.DECIMAL(10, 2),
       name: DataTypes.STRING,

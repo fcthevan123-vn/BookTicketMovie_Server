@@ -11,6 +11,7 @@ module.exports = {
           name: "Mặc định",
           cinemaId: "6d673084-c26f-4ac0-b7dd-dbc7fcba2e6f",
           priceMultiplier: 1.2,
+          status: "open",
           createdAt: "2023-09-16T03:58:44.739Z",
           updatedAt: "2023-09-16T03:58:44.739Z",
           priceNormal: [50000, 70000, 50000],

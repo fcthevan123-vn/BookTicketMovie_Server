@@ -13,4 +13,8 @@ const router = express.Router();
 
 router.get("/all-seats-by-show/:id", SeatController.handleGetAllSeatByShowId);
 
+router.get("/all-seatTypes", SeatController.handleGetAllSeatType);
+
+router.post("/create-seatType", SeatController.handleCreateSeatType);
+
 export default router;

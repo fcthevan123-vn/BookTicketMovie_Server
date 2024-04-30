@@ -42,6 +42,7 @@ class MovieHallServices {
             model: db.RoomType,
           },
         ],
+        order: [["createdAt", "DESC"]],
         nest: true,
       });
 
@@ -219,6 +220,7 @@ class MovieHallServices {
             ],
           },
         ],
+
         nest: true,
       });
 

@@ -3,22 +3,15 @@ import { layoutServices } from "../../services";
 class LayoutController {
   // Create Layout Controller
   async handleCreateLayout(req, res) {
-    const { name, rows, seatsPerRow, normalRows, sweetRows, vipRows } =
-      req.body;
-    if (!name || !rows || !seatsPerRow) {
-      return res.status(401).json({
-        statusCode: 1,
-        message: "Nhập thiếu thông tin",
-      });
-    }
+    const { layout, name, seatsPerRow, totalRows, staffId } = req.body;
+
     try {
       const response = await layoutServices.createLayout({
+        layout,
         name,
-        rows,
         seatsPerRow,
-        normalRows,
-        sweetRows,
-        vipRows,
+        totalRows,
+        staffId,
       });
       if (response.statusCode === 0) {
         return res.status(200).json(response);
@@ -62,6 +55,23 @@ class LayoutController {
       return res
         .status(500)
         .json({ message: "Có lỗi tại handleReadLayout", err: error.message });
+    }
+  }
+
+  async handleGetLayoutByStaff(req, res) {
+    const { staffId } = req.query;
+    try {
+      const response = await layoutServices.getAllLayoutByStaff(staffId);
+      if (response.statusCode === 0) {
+        return res.status(200).json(response);
+      }
+      return res.status(400).json(response);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        message: "Có lỗi tại handleGetLayoutByStaff",
+        err: error.message,
+      });
     }
   }
 

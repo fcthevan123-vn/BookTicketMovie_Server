@@ -14,6 +14,9 @@ module.exports = (sequelize, DataTypes) => {
       SeatType.hasMany(models.Seat, {
         foreignKey: "seatTypeId",
       });
+      SeatType.belongsTo(models.Cinema, {
+        foreignKey: "cinemaId",
+      });
     }
   }
   SeatType.init(
@@ -23,6 +26,11 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
       },
+      cinemaId: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+      },
+      color: DataTypes.STRING,
       name: DataTypes.STRING,
       price: DataTypes.INTEGER,
     },

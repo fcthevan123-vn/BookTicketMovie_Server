@@ -9,6 +9,12 @@ router.post("/create", authorizationAdmin, LayoutController.handleCreateLayout);
 
 router.get("/get-all", LayoutController.handleReadAllLayout);
 
+router.get(
+  "/layout-by-staff",
+  authorizationAdmin,
+  LayoutController.handleGetLayoutByStaff
+);
+
 router.get("/:id", LayoutController.handleReadLayout);
 
 export default router;
