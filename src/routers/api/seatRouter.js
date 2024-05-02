@@ -17,4 +17,6 @@ router.get("/all-seatTypes", SeatController.handleGetAllSeatType);
 
 router.post("/create-seatType", SeatController.handleCreateSeatType);
 
+router.post("/update-seatType", SeatController.handleUpdateSeatType);
+
 export default router;

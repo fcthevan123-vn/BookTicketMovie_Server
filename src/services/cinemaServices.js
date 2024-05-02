@@ -35,6 +35,7 @@ class CinemaServices {
     detailLocation,
     userId,
     hotline,
+    locationName,
     status,
     file,
   }) {
@@ -81,6 +82,7 @@ class CinemaServices {
         location,
         detailLocation,
         userId,
+        locationName,
         hotline,
         status,
         image: imageLink[0],
@@ -103,7 +105,7 @@ class CinemaServices {
   async updateCinema({ data }, file) {
     try {
       const cinema = await db.Cinema.findByPk(data.id);
-
+      console.log("data", data, file);
       if (!cinema) {
         return {
           statusCode: 1,
@@ -131,8 +133,6 @@ class CinemaServices {
         }
       }
 
-      console.log("cinema.name", cinema.name);
-
       if (data.name !== cinema.name) {
         const checkCinemaName = await checkValidNameCinema(
           data.name,
@@ -148,11 +148,11 @@ class CinemaServices {
       }
       const imgOld = cinema.image;
 
-      let imageLink;
+      let imageLink = imgOld;
       if (file.length > 0) {
         const imgUpload = await S3Controller.handleUploadImages(file);
         if (imgUpload.statusCode === 0) {
-          imageLink = imgUpload.data;
+          imageLink = imgUpload.data[0];
         } else {
           return imgUpload;
         }
@@ -164,11 +164,14 @@ class CinemaServices {
       cinema.hotline = data.hotline;
       cinema.status = data.status;
       cinema.userId = data.userId;
-      cinema.image = imageLink[0];
+      cinema.image = imageLink;
+      cinema.locationName = data.locationName;
 
       await cinema.save();
 
-      await S3Controller.handleDelteImagesFromLink(imgOld);
+      if (file.length > 0) {
+        await S3Controller.handleDelteImagesFromLink(imgOld);
+      }
 
       return {
         statusCode: 0,

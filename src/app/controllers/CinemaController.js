@@ -2,8 +2,15 @@ import cinemaServices from "../../services/cinemaServices";
 
 class CinemaController {
   async handleCreateCinema(req, res) {
-    const { name, location, detailLocation, userId, hotline, status } =
-      req.body;
+    const {
+      name,
+      location,
+      detailLocation,
+      userId,
+      hotline,
+      status,
+      locationName,
+    } = req.body;
     if (!name || !location || !detailLocation || !userId) {
       return res.status(401).json({
         statusCode: 1,
@@ -20,6 +27,7 @@ class CinemaController {
         detailLocation,
         userId,
         hotline,
+        locationName,
         status,
         file,
       });

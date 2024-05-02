@@ -1,38 +1,22 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable no-undef */
 "use strict";
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("Cinemas", {
+    await queryInterface.createTable("MenuFoods", {
       id: {
         allowNull: false,
         primaryKey: true,
         defaultValue: Sequelize.UUIDV4,
         type: Sequelize.UUID,
       },
-      userId: {
-        allowNull: false,
-        defaultValue: Sequelize.UUIDV4,
-        type: Sequelize.UUID,
-      },
       name: {
-        type: Sequelize.STRING,
-      },
-      locationName: {
         type: Sequelize.STRING,
       },
       image: {
         type: Sequelize.STRING,
       },
-      hotline: {
-        type: Sequelize.STRING,
-      },
-      location: {
-        type: Sequelize.ARRAY(Sequelize.STRING),
-      },
-      detailLocation: {
-        type: Sequelize.STRING,
+      price: {
+        type: Sequelize.INTEGER,
       },
       status: {
         type: Sequelize.STRING,
@@ -49,6 +33,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("Cinemas");
+    await queryInterface.dropTable("MenuFoods");
   },
 };

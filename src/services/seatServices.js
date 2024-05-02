@@ -1,3 +1,4 @@
+import { where } from "sequelize";
 import db from "../app/models";
 import cinemaServices from "./cinemaServices";
 
@@ -17,6 +18,11 @@ class SeatServices {
               },
               {
                 model: db.Cinema,
+                include: [
+                  {
+                    model: db.SeatType,
+                  },
+                ],
               },
               {
                 model: db.Layout,
@@ -181,7 +187,61 @@ class SeatServices {
     } catch (error) {
       return {
         statusCode: -1,
-        message: "Lỗi trong quá trình getAllSeatType",
+        message: "Lỗi trong quá trình creatSeatType",
+      };
+    }
+  }
+
+  async updateSeatType({ color, name, price, id, cinemaId }) {
+    try {
+      const seatTypeDoc = await db.SeatType.findByPk(id);
+
+      if (seatTypeDoc.name != name) {
+        const checkName = await db.SeatType.findOne({
+          where: {
+            name: name,
+          },
+        });
+
+        if (checkName) {
+          return {
+            statusCode: 1,
+            message: "Tên bạn chọn đã tồn tại, hãy chọn tên khác",
+          };
+        }
+      }
+
+      if (seatTypeDoc.color != color) {
+        const checkColor = await db.SeatType.findOne({
+          where: {
+            color: color,
+          },
+        });
+
+        if (checkColor) {
+          return {
+            statusCode: 1,
+            message: "Màu sắc thể hiện bạn chọn đã tồn tại, hãy chọn tên khác",
+          };
+        }
+      }
+
+      await seatTypeDoc.update({
+        color,
+        name,
+        price,
+        cinemaId,
+      });
+
+      return {
+        statusCode: 0,
+        message: "Tạo loại ghế thành công",
+        data: seatTypeDoc,
+      };
+    } catch (error) {
+      return {
+        statusCode: -1,
+        message: "Lỗi trong quá trình updateSeatType",
       };
     }
   }

@@ -41,6 +41,7 @@ module.exports = (sequelize, DataTypes) => {
       userId: DataTypes.UUID,
       name: DataTypes.STRING,
       location: DataTypes.ARRAY(DataTypes.STRING),
+      locationName: DataTypes.STRING,
       detailLocation: DataTypes.STRING,
       status: {
         type: DataTypes.STRING,

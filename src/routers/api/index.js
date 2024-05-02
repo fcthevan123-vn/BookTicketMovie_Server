@@ -12,6 +12,7 @@ import reviewRouter from "./reviewRouter";
 import paymentRouter from "./paymentRouter";
 import eventRouter from "./eventRouter";
 import discountRouter from "./discountRouter";
+import foodRouter from "./foodRouter";
 
 import express from "express";
 const router = express.Router();
@@ -30,5 +31,6 @@ router.use("/review", reviewRouter);
 router.use("/payment", paymentRouter);
 router.use("/event", eventRouter);
 router.use("/discount", discountRouter);
+router.use("/food", foodRouter);
 
 export default router;

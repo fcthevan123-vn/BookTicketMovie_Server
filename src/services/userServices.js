@@ -1,7 +1,7 @@
 import db from "../app/models";
 import bcrypt from "bcrypt";
 // eslint-disable-next-line no-undef
-const { Op, where } = require("sequelize");
+const { Op } = require("sequelize");
 
 const saltRounds = 10;
 const salt = bcrypt.genSaltSync(saltRounds);
@@ -107,6 +107,25 @@ class UserServices {
 
   async deleteUserById({ id }) {
     try {
+      console.log("id-----------------", id);
+      const checkIsEmployee = await db.Cinema.findOne({
+        where: {
+          userId: id,
+        },
+        include: [
+          {
+            model: db.User,
+          },
+        ],
+      });
+
+      if (checkIsEmployee) {
+        return {
+          statusCode: 1,
+          message: `${checkIsEmployee.User.fullName} đang làm nhân viên quản lý tại ${checkIsEmployee.name}. Vui lòng đổi nhân viên quản lý khác và thực hiện lại hành động`,
+        };
+      }
+
       const userExisted = await db.User.findOne({ where: { id } });
       if (!userExisted) {
         return {
@@ -125,6 +144,7 @@ class UserServices {
         data: userExisted,
       };
     } catch (error) {
+      console.log("error", error);
       return {
         statusCode: 2,
         message: "Có lỗi xảy ra khi deleteUserById",

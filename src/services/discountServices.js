@@ -288,7 +288,7 @@ class DiscountServices {
           };
         }
 
-        movieDoc.update({
+        await movieDoc.update({
           discountId: discountId,
         });
       }

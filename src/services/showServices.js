@@ -1,6 +1,6 @@
 import db from "../app/models";
 import cinemaServices from "./cinemaServices";
-import { Op } from "sequelize";
+import { Op, where } from "sequelize";
 
 class ShowServices {
   async getSeatStatusOfShowsByMovieId(movieId, roomTypeId, date, locationCode) {
@@ -351,6 +351,64 @@ class ShowServices {
       return {
         statusCode: -1,
         message: "Lỗi trong quá trình deleteShow",
+      };
+    }
+  }
+
+  async getShowByCinema(staffId) {
+    try {
+      const cinemaDoc = await db.Cinema.findOne({
+        where: {
+          userId: staffId,
+        },
+        include: [
+          {
+            model: db.MovieHall,
+          },
+        ],
+      });
+
+      const filterMovieHall = cinemaDoc.MovieHalls.map((item) => item.id);
+
+      const filterMovieHallName = cinemaDoc.MovieHalls.map((item) => item.name);
+
+      const allShows = await db.Show.findAll({
+        where: {
+          movieHallId: {
+            [Op.in]: filterMovieHall,
+          },
+        },
+        order: [["startTime", "ASC"]],
+        include: [
+          {
+            model: db.Movie,
+          },
+          {
+            model: db.MovieHall,
+            include: [
+              {
+                model: db.Layout,
+              },
+              {
+                model: db.RoomType,
+              },
+            ],
+          },
+        ],
+      });
+
+      return {
+        statusCode: 0,
+        message: "Lấy dữ liệu thành công",
+        data: cinemaDoc,
+        allShows,
+        filterMovieHallName,
+      };
+    } catch (error) {
+      console.log("error", error);
+      return {
+        statusCode: -1,
+        message: "Lỗi trong quá trình getShowByCinema",
       };
     }
   }

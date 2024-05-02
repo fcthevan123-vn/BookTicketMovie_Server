@@ -21,7 +21,9 @@ module.exports = (sequelize, DataTypes) => {
       Booking.hasMany(models.SeatStatus, {
         foreignKey: "bookingId",
       });
-
+      Booking.hasMany(models.OrderFood, {
+        foreignKey: "bookingId",
+      });
       // Payment here (update soon)
     }
   }

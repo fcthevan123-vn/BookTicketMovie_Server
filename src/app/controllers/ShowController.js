@@ -103,6 +103,25 @@ class ShowController {
         .json({ message: "Có lỗi tại handleDeleteShow", err: error.message });
     }
   }
+
+  async handleGetShowByCinema(req, res) {
+    const { staffId } = req.query;
+    console.log("staffId", staffId);
+
+    try {
+      const response = await showServices.getShowByCinema(staffId);
+
+      if (response.statusCode === 0) {
+        return res.status(200).json(response);
+      }
+      return res.status(400).json(response);
+    } catch (error) {
+      return res.status(500).json({
+        message: "Có lỗi tại handleGetShowByCinema",
+        err: error.message,
+      });
+    }
+  }
 }
 
 export default new ShowController();

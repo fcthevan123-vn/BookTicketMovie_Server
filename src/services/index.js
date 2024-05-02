@@ -12,3 +12,4 @@ export { default as seatStatusServices } from "./seatStatusServices";
 export { default as bookingServices } from "./bookingServices";
 export { default as eventServices } from "./eventServices";
 export { default as discountServices } from "./discountServices";
+export { default as foodServices } from "./foodServices";

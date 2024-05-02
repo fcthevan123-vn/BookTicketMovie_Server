@@ -383,8 +383,9 @@ class MovieController {
   }
 
   async handleGetShowByMovie(req, res) {
+    const { staffId } = req.query;
     try {
-      const response = await movieServices.getAllShowTimeByMovieId();
+      const response = await movieServices.getAllShowTimeByMovieId(staffId);
       if (response.statusCode === 0) {
         return res.status(200).json(response);
       } else {

@@ -12,3 +12,4 @@ export { default as BookingController } from "./BookingController";
 export { default as PaymentController } from "./PaymentController";
 export { default as EventController } from "./EventController";
 export { default as DiscountController } from "./DiscountController";
+export { default as FoodController } from "./FoodController";

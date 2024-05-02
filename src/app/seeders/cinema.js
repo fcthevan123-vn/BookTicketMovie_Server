@@ -13,6 +13,7 @@ module.exports = {
           name: "rap phim test",
           location: ["92", "916", "31149"],
           userId: "dacd0aa0-1bf6-476d-87fe-f96af72f60a1",
+          locationName: "Phường An Khánh - Quận Ninh Kiều - Thành phố Cần Thơ",
           detailLocation: "Trung tâm thành phố Cần Thơ",
           status: "open",
           hotline: "19002224",
