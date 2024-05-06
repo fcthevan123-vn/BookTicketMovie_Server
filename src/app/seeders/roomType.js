@@ -17,6 +17,17 @@ module.exports = {
           priceNormal: [50000, 70000, 50000],
           priceHoliday: [60000, 95000, 70000],
         },
+        {
+          id: "28e883e6-5de5-4996-9314-aef43731690b",
+          status: "open",
+          cinemaId: "6d673084-c26f-4ac0-b7dd-dbc7fcba2e6f",
+          priceMultiplier: "0.00",
+          name: "Phòng Gold",
+          priceNormal: [80000, 90000, 10000],
+          priceHoliday: [100000, 110000, 120000],
+          createdAt: "2024-05-05T06:36:15.110Z",
+          updatedAt: "2024-05-05T06:36:15.110Z",
+        },
       ],
       {}
     );

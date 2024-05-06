@@ -1,7 +1,9 @@
 import db from "../app/models";
 import cinemaServices from "./cinemaServices";
+import moment from "moment";
+import "moment/locale/vi";
 import { Op, where } from "sequelize";
-
+moment.locale("vi");
 class ShowServices {
   async getSeatStatusOfShowsByMovieId(movieId, roomTypeId, date, locationCode) {
     try {
@@ -182,9 +184,11 @@ class ShowServices {
     }
   }
 
-  async getAllShowInCinema(movieId, date, cinemas) {
+  async getAllShowInCinema(movieId, date, cinemas, isArrange) {
     try {
       const shows = [];
+
+      console.log("new Date", moment(new Date()).toDate());
 
       for (const cinema of cinemas) {
         const cinemaShows = [];
@@ -194,7 +198,11 @@ class ShowServices {
             where: {
               movieId: movieId,
               date: date,
+              startTime: {
+                [Op.gte]: new Date(),
+              },
             },
+            order: [["startTime", "ASC"]],
             include: [
               {
                 model: db.MovieHall,

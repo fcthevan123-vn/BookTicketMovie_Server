@@ -42,6 +42,9 @@ module.exports = {
         type: Sequelize.STRING,
         defaultValue: "direct",
       },
+      date: {
+        type: Sequelize.DATEONLY,
+      },
       status: {
         type: Sequelize.STRING,
         defaultValue: "Chờ xác nhận",

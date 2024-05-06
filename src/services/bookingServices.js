@@ -167,6 +167,17 @@ class BookingServices {
         }
       }
 
+      const showDoc = await db.Show.findOne({
+        where: {
+          id: showId,
+        },
+      });
+
+      await db.Movie.increment(
+        { countBooked: 1 },
+        { where: { id: showDoc.movieId } }
+      );
+
       const bookingDoc = await db.Booking.create({
         userId: userId,
         showId: showId,
@@ -175,6 +186,7 @@ class BookingServices {
         isPaid: isPaid,
         discountId: discountId,
         status: status,
+        date: new Date(),
       });
 
       if (!bookingDoc) {
@@ -529,6 +541,93 @@ class BookingServices {
         error: error.message,
         statusCode: 4,
         message: "Đã có lỗi xảy ra tại getBookingByStatus - BookingServices",
+      };
+    }
+  }
+
+  async getBookingByStaff(staffId) {
+    try {
+      const cinemaDoc = await db.Cinema.findOne({
+        where: {
+          userId: staffId,
+        },
+      });
+
+      if (!cinemaDoc) {
+        return {
+          statusCode: 1,
+          message: "Khong tim thay du lieu",
+        };
+      }
+
+      const allMovieHall = await db.MovieHall.findAll({
+        where: {
+          cinemaId: cinemaDoc.id,
+        },
+      });
+
+      let bookingData = [];
+
+      if (allMovieHall.length > 0) {
+        const movieHallIds = allMovieHall.map((item) => item.id);
+
+        const allShows = await db.Show.findAll({
+          where: {
+            movieHallId: {
+              [Op.in]: movieHallIds,
+            },
+          },
+        });
+
+        if (allShows.length > 0) {
+          const showIds = allShows.map((item) => item.id);
+          console.log("showIds-------", showIds);
+          const allBookings = await db.Booking.findAll({
+            where: {
+              showId: {
+                [Op.in]: showIds,
+              },
+            },
+            order: [["createdAt", "DESC"]],
+            include: [
+              {
+                model: db.Show,
+                include: [
+                  {
+                    model: db.MovieHall,
+                    include: [{ model: db.Cinema }, { model: db.RoomType }],
+                  },
+                  {
+                    model: db.Movie,
+                  },
+                ],
+              },
+              { model: db.User },
+              { model: db.User, as: "Staff" }, //staff id
+              {
+                model: db.SeatStatus,
+                include: [
+                  {
+                    model: db.Seat,
+                  },
+                ],
+              },
+            ],
+          });
+          bookingData = allBookings;
+        }
+      }
+
+      return {
+        statusCode: 0,
+        message: "Thanh cong",
+        data: bookingData,
+      };
+    } catch (error) {
+      return {
+        error: error.message,
+        statusCode: -1,
+        message: "Đã có lỗi xảy ra tại getBookingByStaff",
       };
     }
   }

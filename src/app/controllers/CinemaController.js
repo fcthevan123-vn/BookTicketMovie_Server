@@ -69,6 +69,23 @@ class CinemaController {
     }
   }
 
+  async handleGetCinemaByStaff(req, res) {
+    const { staffId } = req.query;
+    try {
+      const response = await cinemaServices.getCinemaByStaff(staffId);
+      if (response.statusCode === 0) {
+        return res.status(200).json(response);
+      }
+      return res.status(400).json(response);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        message: "Có lỗi tại handleGetCinemaByStaff",
+        err: error.message,
+      });
+    }
+  }
+
   async handleDeleteCinema(req, res) {
     const { id } = req.params;
     if (!id) {

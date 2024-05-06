@@ -23,6 +23,7 @@ class ReviewServices {
         movieId,
         star,
         content,
+        date: new Date(),
       });
 
       if (!reviewDoc) {
@@ -198,6 +199,26 @@ class ReviewServices {
     }
   }
 
+  async getAllReview() {
+    try {
+      const reviewDoc = await db.Review.findAll({
+        order: [["updatedAt", "DESC"]],
+      });
+
+      return {
+        statusCode: 0,
+        message: "Lấy đánh giá thành công",
+        data: reviewDoc,
+      };
+    } catch (error) {
+      console.log("error", error);
+      return {
+        statusCode: 2,
+        message: "Có lỗi xảy ra khi getAllReview",
+      };
+    }
+  }
+
   async calculateStar({ movieId }) {
     try {
       const movieDoc = await db.Movie.findByPk(movieId);
@@ -250,7 +271,7 @@ class ReviewServices {
   async checkUserCanReview({ movieId, userId }) {
     try {
       const userWatchedMovie = await db.Booking.findAll({
-        where: { userId: userId },
+        where: { userId: userId, status: "Đã nhận vé" },
         include: [
           {
             model: db.Show,
@@ -263,7 +284,7 @@ class ReviewServices {
           },
         ],
       });
-      if (!userWatchedMovie[0].Show) {
+      if (userWatchedMovie.length <= 0) {
         return {
           statusCode: 0,
           check: false,

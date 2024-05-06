@@ -19,7 +19,7 @@ router.post(
   FoodController.handleUpdateFood
 );
 
-router.get("/all-food", authorizationAdmin, FoodController.handleGetFood);
+router.get("/all-food", FoodController.handleGetFood);
 
 router.get(
   "/cancel-food",

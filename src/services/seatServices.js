@@ -1,4 +1,3 @@
-import { where } from "sequelize";
 import db from "../app/models";
 import cinemaServices from "./cinemaServices";
 

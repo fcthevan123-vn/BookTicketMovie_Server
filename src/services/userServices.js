@@ -1,7 +1,8 @@
-import db from "../app/models";
+import moment from "moment";
+import db, { Sequelize } from "../app/models";
 import bcrypt from "bcrypt";
 // eslint-disable-next-line no-undef
-const { Op } = require("sequelize");
+const { Op, where } = require("sequelize");
 
 const saltRounds = 10;
 const salt = bcrypt.genSaltSync(saltRounds);
@@ -460,6 +461,525 @@ class UserServices {
       return {
         statusCode: 2,
         message: "Có lỗi xảy ra tại getAllUserByRule",
+      };
+    }
+  }
+
+  async adminGetQuantity() {
+    try {
+      const { count: countUser } = await db.User.findAndCountAll();
+      const { count: countCinema, rows: cinemaDoc } =
+        await db.Cinema.findAndCountAll();
+      const { count: countMovieHall, rows: movieHallDoc } =
+        await db.MovieHall.findAndCountAll();
+      const { count: countMovie, rows: movieDoc } =
+        await db.Movie.findAndCountAll();
+      const { count: countReview } = await db.Review.findAndCountAll();
+
+      const dataTotal = {
+        countUser,
+        countCinema,
+        countMovieHall,
+        countMovie,
+        countReview,
+      };
+
+      const cinemaConvert = cinemaDoc.map((cinema) => {
+        return {
+          value: cinema.id,
+          label: cinema.name,
+        };
+      });
+
+      const movieHallConvert = movieHallDoc.map((movieHall) => {
+        return {
+          value: movieHall.id,
+          label: movieHall.name,
+          cinemaId: movieHall.cinemaId,
+        };
+      });
+
+      const movieConvert = movieDoc.map((movie) => {
+        return {
+          value: movie.id,
+          label: movie.title,
+        };
+      });
+
+      const dataSelect = {
+        cinema: cinemaConvert,
+        movieHall: movieHallConvert,
+        movie: movieConvert,
+      };
+
+      return {
+        statusCode: 0,
+        message: "Get user thành công",
+        data: dataTotal,
+        dataSelect,
+      };
+    } catch (error) {
+      return {
+        statusCode: 2,
+        message: "Có lỗi xảy ra tại getAllUserByRule",
+      };
+    }
+  }
+
+  async statisticBookingAndCount({ cinemaId, movieHallId, movieId, timeType }) {
+    try {
+      let queryCinema = {};
+
+      if (cinemaId != "null" && cinemaId != "-1") {
+        queryCinema = {
+          where: {
+            id: cinemaId,
+          },
+        };
+      }
+
+      const cinemaDoc = await db.Cinema.findAll(queryCinema);
+
+      const cinemaIds = cinemaDoc.map((cinema) => cinema.id);
+
+      let queryMovieHall = {
+        where: {
+          cinemaId: cinemaIds,
+        },
+      };
+
+      if (movieHallId != "null" && movieHallId != "-1") {
+        queryMovieHall = {
+          where: {
+            id: movieHallId,
+          },
+        };
+      }
+
+      const movieHallDoc = await db.MovieHall.findAll(queryMovieHall);
+
+      const movieHallIds = movieHallDoc.map((cinema) => cinema.id);
+
+      let queryMovie = {};
+
+      if (movieId != "null" && movieId != "-1") {
+        console.log("movieId", movieId);
+        queryMovie = {
+          where: {
+            id: movieId,
+          },
+        };
+      }
+
+      const movieDoc = await db.Movie.findAll(queryMovie);
+
+      const movieIds = movieDoc.map((item) => item.id);
+
+      const showDoc = await db.Show.findAll({
+        where: {
+          movieHallId: {
+            [Op.in]: movieHallIds,
+          },
+          movieId: {
+            [Op.in]: movieIds,
+          },
+        },
+      });
+
+      const showIds = showDoc.map((item) => item.id);
+
+      const currentDate = moment().toDate();
+
+      const listDays = [currentDate];
+
+      for (let i = 1; i <= 4; i++) {
+        const dateFormat = moment(currentDate).subtract(i, timeType).toDate();
+
+        listDays.unshift(dateFormat);
+      }
+
+      const bookingStatistic = [];
+      const countBookingStatistic = [];
+
+      for (const dateFormatted of listDays) {
+        const endDate = moment(dateFormatted)
+          .add(1, timeType)
+          .subtract(1, "days")
+          .toDate();
+
+        const bookingSum = await db.Booking.sum("totalPrice", {
+          where: {
+            showId: {
+              [Op.in]: showIds,
+            },
+            isPaid: true,
+            date: {
+              [Op.between]: [dateFormatted, endDate],
+            },
+          },
+        });
+
+        const { count: countBookingSuccess } = await db.Booking.findAndCountAll(
+          {
+            where: {
+              showId: {
+                [Op.in]: showIds,
+              },
+              isPaid: true,
+              date: {
+                [Op.between]: [dateFormatted, endDate],
+              },
+            },
+          }
+        );
+
+        const { count: countBookingFail } = await db.Booking.findAndCountAll({
+          where: {
+            showId: {
+              [Op.in]: showIds,
+            },
+            isPaid: false,
+            date: {
+              [Op.between]: [dateFormatted, endDate],
+            },
+          },
+        });
+
+        bookingStatistic.push({
+          date: moment(dateFormatted).format("DD/MM/YY"),
+          "Doanh thu": bookingSum ? bookingSum : 0,
+        });
+
+        countBookingStatistic.push({
+          date: moment(dateFormatted).format("DD/MM/YY"),
+          "Vé thành công": countBookingSuccess,
+          "Vé bị huỷ": countBookingFail,
+        });
+      }
+
+      // const endDate =
+
+      const { count: totalBooking } = await db.Booking.findAndCountAll();
+
+      const totalSum = await db.Booking.sum("totalPrice", {
+        where: {
+          showId: {
+            [Op.in]: showIds,
+          },
+          isPaid: true,
+        },
+      });
+
+      // Trending movie
+      let movieTrendingData = null;
+
+      const movieTrending = await db.Movie.findAll({
+        order: [["countBooked", "DESC"]],
+      });
+
+      if (movieTrending.length > 0) {
+        const allShows = await db.Show.findAll({
+          where: {
+            movieId: movieTrending[0].id,
+          },
+        });
+
+        const showIds = allShows.map((item) => item.id);
+
+        const bookingSum = await db.Booking.sum("totalPrice", {
+          where: {
+            isPaid: true,
+            showId: {
+              [Op.in]: showIds,
+            },
+          },
+        });
+
+        const { count: bookingCount } = await db.Booking.findAndCountAll({
+          where: {
+            showId: {
+              [Op.in]: showIds,
+            },
+          },
+        });
+
+        movieTrendingData = {
+          movie: movieTrending[0],
+          bookingSum,
+          bookingCount,
+        };
+      }
+
+      // trending cinema
+      let max = 0;
+      let cinemaTrending;
+      let cinemaCount;
+
+      const allCinema = await db.Cinema.findAll();
+
+      const allCinemaIds = allCinema.map((item) => item.id);
+
+      for (const cinemaId of allCinemaIds) {
+        const allMovieHalls = await db.MovieHall.findAll({
+          where: {
+            cinemaId: cinemaId,
+          },
+        });
+
+        if (allMovieHalls.length > 0) {
+          const allMovieHallIds = allMovieHalls.map((item) => item.id);
+
+          const allShows = await db.Show.findAll({
+            where: {
+              movieHallId: {
+                [Op.in]: allMovieHallIds,
+              },
+            },
+          });
+
+          if (allShows.length > 0) {
+            const allShowIds = allShows.map((item) => item.id);
+
+            const bookingSum = await db.Booking.sum("totalPrice", {
+              where: {
+                showId: {
+                  [Op.in]: allShowIds,
+                },
+                isPaid: true,
+              },
+            });
+
+            const { count: bookingCount } = await db.Booking.findAndCountAll({
+              where: {
+                showId: {
+                  [Op.in]: allShowIds,
+                },
+              },
+            });
+
+            if (bookingSum >= max) {
+              max = bookingSum;
+              const cinemaDoc = await db.Cinema.findByPk(cinemaId);
+              cinemaTrending = cinemaDoc;
+              cinemaCount = bookingCount;
+            }
+          }
+        }
+      }
+
+      return {
+        statusCode: 0,
+        message: "Get user thành công",
+        bookingStatistic,
+        countBookingStatistic,
+        totalBooking,
+        totalSum,
+        movieTrendingData,
+        cinemaTrending: {
+          cinemaTrending,
+          max,
+          cinemaCount,
+        },
+      };
+    } catch (error) {
+      return {
+        statusCode: 2,
+        message: "Có lỗi xảy ra tại statisticBookingAndCount",
+        error: error.message,
+      };
+    }
+  }
+
+  async staticByday({ date }) {
+    try {
+      const startOfTime = moment(date).startOf("day").toDate();
+      const endOfTime = moment(date).endOf("day").toDate();
+      // const userReg = await db.User.findAll({
+      //   crea
+      // })
+
+      const { count: countReview } = await db.Review.findAndCountAll({
+        where: {
+          date: {
+            [Op.eq]: date,
+          },
+        },
+      });
+
+      const { count: countShow } = await db.Show.findAndCountAll({
+        where: {
+          createdAt: {
+            [Op.between]: [startOfTime, endOfTime],
+          },
+        },
+      });
+
+      const { count: countBooking } = await db.Booking.findAndCountAll({
+        where: {
+          date: {
+            [Op.eq]: date,
+          },
+        },
+      });
+
+      const { count: countUser } = await db.User.findAndCountAll({
+        where: {
+          createdAt: {
+            [Op.between]: [startOfTime, endOfTime],
+          },
+        },
+      });
+
+      let statisticUser = [];
+
+      const intinialData = [
+        {
+          min: 0,
+          max: 17,
+          label: "Dưới 18 tuổi",
+        },
+        {
+          min: 18,
+          max: 25,
+          label: "18 - 25 tuổi",
+        },
+        {
+          min: 26,
+          max: 35,
+          label: "26 - 35 tuổi",
+        },
+        {
+          min: 36,
+          max: 18052002,
+          label: "Trên 36 tuổi",
+        },
+      ];
+
+      for (const data of intinialData) {
+        const { count: userCountMale } = await db.User.findAndCountAll({
+          where: {
+            sex: "0",
+            age: {
+              [Op.between]: [data.min, data.max],
+            },
+          },
+        });
+
+        const { count: userCountFemale } = await db.User.findAndCountAll({
+          where: {
+            sex: "1",
+            age: {
+              [Op.between]: [data.min, data.max],
+            },
+          },
+        });
+
+        const dataFormat = {
+          ageRange: data.label,
+          Nam: userCountMale,
+          Nữ: userCountFemale,
+        };
+
+        statisticUser.push(dataFormat);
+      }
+
+      return {
+        statusCode: 0,
+        message: "Thanh cong",
+        countReview,
+        countShow,
+        countUser,
+        countBooking,
+        statisticUser,
+      };
+    } catch (error) {
+      return {
+        statusCode: -1,
+        message: "Có lỗi xảy ra tại staticByday",
+        error: error.message,
+      };
+    }
+  }
+
+  async statisticEmployee(cinemaId) {
+    try {
+      const movieHallDocs = await db.MovieHall.findAll({
+        where: { cinemaId: cinemaId },
+      });
+
+      const movieHallIds = movieHallDocs.map((movieHall) => movieHall.id);
+
+      const showDoc = await db.Show.findAll({
+        where: {
+          movieHallId: {
+            [Op.in]: movieHallIds,
+          },
+        },
+        include: [
+          {
+            model: db.Movie,
+          },
+          {
+            model: db.MovieHall,
+          },
+        ],
+        order: [["startTime", "DESC"]],
+      });
+
+      const allShowDoc = await db.Show.findAll({
+        where: {
+          movieHallId: {
+            [Op.in]: movieHallIds,
+          },
+        },
+      });
+
+      const showIds = allShowDoc.map((show) => show.id);
+
+      const bookingDoc = await db.Booking.findAll({
+        where: {
+          showId: {
+            [Op.in]: showIds,
+          },
+        },
+        include: [
+          {
+            model: db.SeatStatus,
+            include: [
+              {
+                model: db.Seat,
+              },
+            ],
+          },
+          {
+            model: db.Show,
+            include: [
+              {
+                model: db.MovieHall,
+              },
+              {
+                model: db.Movie,
+              },
+            ],
+          },
+          {
+            model: db.User,
+          },
+        ],
+        order: [["createdAt", "DESC"]],
+      });
+
+      return {
+        statusCode: 0,
+        message: "Thanh cong",
+        recentShow: showDoc.slice(0, 5),
+        recentBooking: bookingDoc.slice(0, 5),
+      };
+    } catch (error) {
+      return {
+        statusCode: -1,
+        message: "Có lỗi xảy ra tại statisticEmployee",
+        error: error.message,
       };
     }
   }

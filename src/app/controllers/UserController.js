@@ -267,6 +267,80 @@ class UserController {
       });
     }
   }
+
+  async handleGetStatisticByAdmin(req, res) {
+    try {
+      const response = await userServices.adminGetQuantity();
+      if (response.statusCode === 0) {
+        return res.status(200).json(response);
+      }
+      return res.status(400).json(response);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        message: "Error handleSearchTypeUser",
+        err: error.message,
+      });
+    }
+  }
+
+  async handleStatisticBooking(req, res) {
+    const { cinemaId, movieHallId, movieId, timeType } = req.query;
+    try {
+      const response = await userServices.statisticBookingAndCount({
+        cinemaId,
+        movieHallId,
+        movieId,
+        timeType,
+      });
+      if (response.statusCode === 0) {
+        return res.status(200).json(response);
+      }
+      return res.status(400).json(response);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        message: "Error handleStatisticBooking",
+        err: error.message,
+      });
+    }
+  }
+
+  async handleStatisticByDay(req, res) {
+    const { date } = req.query;
+    try {
+      const response = await userServices.staticByday({
+        date,
+      });
+      if (response.statusCode === 0) {
+        return res.status(200).json(response);
+      }
+      return res.status(400).json(response);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        message: "Error handleStatisticBooking",
+        err: error.message,
+      });
+    }
+  }
+
+  async handleStatisticCinema(req, res) {
+    const { cinemaId } = req.query;
+    try {
+      const response = await userServices.statisticEmployee(cinemaId);
+      if (response.statusCode === 0) {
+        return res.status(200).json(response);
+      }
+      return res.status(400).json(response);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        message: "Error handleStatisticBooking",
+        err: error.message,
+      });
+    }
+  }
 }
 
 export default new UserController();

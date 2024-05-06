@@ -29,6 +29,7 @@ module.exports = (sequelize, DataTypes) => {
       userId: DataTypes.UUID,
       movieId: DataTypes.UUID,
       content: DataTypes.STRING,
+      date: DataTypes.DATEONLY,
       star: DataTypes.INTEGER,
     },
     {

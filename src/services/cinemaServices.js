@@ -512,6 +512,7 @@ class CinemaServices {
 
   async getCinemaByStaff(staffId) {
     try {
+      console.log("---------staffId-----------", staffId);
       const cinemaDoc = await db.Cinema.findOne({
         where: {
           userId: staffId,
@@ -535,6 +536,7 @@ class CinemaServices {
         statusCode: -1,
         message: "Đã có lỗi xảy ra khi getCinemaByStaff",
         error: error.message,
+        staffId: staffId,
       };
     }
   }

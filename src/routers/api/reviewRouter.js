@@ -37,4 +37,6 @@ router.get("/calculate-star-rating", ReviewController.handleCalculateStar);
 // query userId
 router.get("/all-user-review", ReviewController.handleGetAllReviewsOfUser);
 
+router.get("/all-review", ReviewController.handleGetAllReview);
+
 export default router;

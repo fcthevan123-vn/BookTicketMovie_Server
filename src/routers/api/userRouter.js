@@ -78,4 +78,22 @@ router.get(
 
 router.get("/search", authorizationAdmin, UserController.handleSearchTypeUser);
 
+router.get(
+  "/dashboard",
+  authorizationToken,
+  authorizationAdmin,
+  UserController.handleGetStatisticByAdmin
+);
+
+router.get(
+  "/statistic-admin",
+  // authorizationToken,
+  // authorizationAdmin,
+  UserController.handleStatisticBooking
+);
+
+router.get("/statistic-by-day", UserController.handleStatisticByDay);
+
+router.get("/statistic-cinema", UserController.handleStatisticCinema);
+
 export default router;

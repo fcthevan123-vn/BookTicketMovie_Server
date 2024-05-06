@@ -157,7 +157,7 @@ class PaymentController {
     vnp_Params["vnp_TxnRef"] = idTransaction;
     vnp_Params["vnp_OrderInfo"] = "Thanh toan cho ma GD:" + idTransaction;
     vnp_Params["vnp_OrderType"] = "Thanh toan VNPAY";
-    vnp_Params["vnp_Amount"] = 12345678;
+    vnp_Params["vnp_Amount"] = totalPrice;
     vnp_Params["vnp_ReturnUrl"] = returnUrl;
     vnp_Params["vnp_IpAddr"] = ipAddr;
     vnp_Params["vnp_CreateDate"] = createDate;

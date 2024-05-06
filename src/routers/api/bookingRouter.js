@@ -15,4 +15,6 @@ router.post("/update", BookingController.handleUpdateBooking);
 
 router.post("/by-status", BookingController.handleGetBookingByStatus);
 
+router.get("/by-staff", BookingController.handleGetBookingByStaff);
+
 export default router;

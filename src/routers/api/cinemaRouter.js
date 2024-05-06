@@ -27,4 +27,6 @@ router.post("/search", CinemaController.hanldeSearchCinema);
 
 router.post("/cinemas-have-shows", CinemaController.handleGetAllCinemasByQuery);
 
+router.get("/by-staff", CinemaController.handleGetCinemaByStaff);
+
 export default router;
