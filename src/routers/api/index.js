@@ -13,7 +13,7 @@ import paymentRouter from "./paymentRouter";
 import eventRouter from "./eventRouter";
 import discountRouter from "./discountRouter";
 import foodRouter from "./foodRouter";
-
+import notificationRouter from "./notificationRouter";
 import express from "express";
 const router = express.Router();
 
@@ -32,5 +32,6 @@ router.use("/payment", paymentRouter);
 router.use("/event", eventRouter);
 router.use("/discount", discountRouter);
 router.use("/food", foodRouter);
+router.use("/notification", notificationRouter);
 
 export default router;

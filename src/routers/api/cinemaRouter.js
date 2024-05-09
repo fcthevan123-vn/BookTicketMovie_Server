@@ -28,5 +28,6 @@ router.post("/search", CinemaController.hanldeSearchCinema);
 router.post("/cinemas-have-shows", CinemaController.handleGetAllCinemasByQuery);
 
 router.get("/by-staff", CinemaController.handleGetCinemaByStaff);
+router.post("/filter-cinema", CinemaController.handleFilterCinema);
 
 export default router;

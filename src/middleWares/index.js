@@ -1,5 +1,7 @@
 import jwt from "jsonwebtoken";
 import multer from "multer";
+import { Sequelize } from "../app/models";
+import { Op } from "sequelize";
 
 // error handler
 export function handleError(err, req, res, next) {
@@ -85,6 +87,28 @@ export function authorizationAdmin(req, res, next) {
       message: "Đã có lỗi xảy ra tại authorizationAdmin ",
     });
   }
+}
+
+export function removeAccentsAndLowerCase(str) {
+  return str
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+}
+
+export function searchLikeDeep(dbName, colName, value) {
+  const wordsToSearch = removeAccentsAndLowerCase(value)
+    .split(/\s+/)
+    .filter(Boolean);
+  const wordConditions = wordsToSearch.map((word) =>
+    Sequelize.where(
+      Sequelize.fn("unaccent", Sequelize.col(`${dbName}.${colName}`)),
+      {
+        [Op.iLike]: Sequelize.fn("unaccent", "%" + word + "%"),
+      }
+    )
+  );
+  return { [Op.and]: wordConditions };
 }
 
 // multer

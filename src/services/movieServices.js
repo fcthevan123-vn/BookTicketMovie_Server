@@ -1,5 +1,6 @@
 import S3Controller from "../app/controllers/S3Controller";
 import db from "../app/models";
+import { searchLikeDeep } from "../middleWares";
 // eslint-disable-next-line no-undef
 const { Op } = require("sequelize");
 
@@ -236,7 +237,6 @@ class movieServices {
           actors,
           genre,
           images: [...imageMerge, ...imageData],
-          countBooked: 0,
         },
         {
           where: {
@@ -348,17 +348,41 @@ class movieServices {
           },
         },
       });
-      if (!activeMovies) {
-        return {
-          statusCode: 1,
-          message: "Phim rỗng",
-        };
-      }
+
+      const nextMovies = await db.Movie.findAll({
+        where: {
+          releaseDate: {
+            [Op.gt]: new Date(),
+          },
+        },
+      });
+
+      const trendingMovies = await db.Movie.findAll({
+        order: [["countBooked", "DESC"]],
+        limit: 4,
+      });
+
+      const topBookMovie = await db.Movie.findOne({
+        order: [["countBooked", "DESC"]],
+      });
+
+      const topStarMovie = await db.Movie.findOne({
+        order: [["averageRating", "DESC"]],
+      });
 
       return {
         statusCode: 0,
+        cc: "casda",
         message: "Lấy danh sách phim thành công",
-        data: activeMovies,
+        data: {
+          activeMovies: activeMovies,
+          nextMovies: nextMovies,
+          trendingMovies: trendingMovies,
+          topMovie: {
+            topBookMovie: topBookMovie,
+            topStarMovie: topStarMovie,
+          },
+        },
       };
     } catch (error) {
       console.error(error);
@@ -537,19 +561,26 @@ class movieServices {
   ) {
     try {
       let whereCondition = {
-        title: {
-          [Op.iLike]: `%${title}%`,
-        },
+        title: searchLikeDeep("Movie", "title", title),
       };
 
-      if (ageRequire && parseInt(ageRequire) < 18) {
-        whereCondition.ageRequire = {
-          [Op.lt]: 18,
-        };
-      } else if (ageRequire && parseInt(ageRequire) >= 18) {
-        whereCondition.ageRequire = {
-          [Op.gte]: 18,
-        };
+      let orderCondition = [["createdAt", "ASC"]];
+
+      // if (ageRequire && parseInt(ageRequire) < 18) {
+      //   whereCondition.ageRequire = {
+      //     [Op.lt]: 18,
+      //   };
+      // } else if (ageRequire && parseInt(ageRequire) >= 18) {
+      //   whereCondition.ageRequire = {
+      //     [Op.gte]: 18,
+      //   };
+      // }
+
+      if (ageRequire) {
+        whereCondition.ageRequire = ageRequire;
+      }
+      if (rating) {
+        orderCondition = [["averageRating", rating]];
       }
 
       if (subtitle.length > 0) {
@@ -575,7 +606,6 @@ class movieServices {
           [Op.gt]: currentDate,
         };
       }
-      console.log("genre", genre);
       if (genre.length > 0) {
         whereCondition.genre = {
           [Op.contains]: genre,
@@ -585,7 +615,7 @@ class movieServices {
       const { count, rows: movieDoc } = await db.Movie.findAndCountAll({
         offset: (page - 1) * limit,
         limit: limit,
-        order: [["createdAt", "ASC"]],
+        order: orderCondition,
         where: whereCondition,
       });
 

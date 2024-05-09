@@ -26,6 +26,25 @@ class ReviewServices {
         date: new Date(),
       });
 
+      const { count: reviewCount } = await db.Review.findAndCountAll({
+        where: {
+          movieId: movieId,
+        },
+      });
+
+      const reviewSum = await db.Review.sum("star", {
+        where: {
+          movieId: movieId,
+        },
+      });
+
+      const averageStar = reviewSum / reviewCount;
+
+      const updateMovieStar = await db.Movie.findByPk(movieId);
+      updateMovieStar.update({
+        averageRating: averageStar,
+      });
+
       if (!reviewDoc) {
         return {
           statusCode: 1,
@@ -37,6 +56,9 @@ class ReviewServices {
         statusCode: 0,
         message: "Đánh giá thành công",
         data: reviewDoc,
+        averageStar,
+        reviewSum,
+        reviewCount,
       };
     } catch (error) {
       console.log(error);
@@ -58,6 +80,37 @@ class ReviewServices {
           where: { id },
         }
       );
+
+      const reviewDoc = await db.Review.findOne({
+        where: { id: id },
+        include: [
+          {
+            model: db.Movie,
+          },
+        ],
+      });
+
+      const movieId = reviewDoc.Movie.id;
+
+      const { count: reviewCount } = await db.Review.findAndCountAll({
+        where: {
+          movieId: movieId,
+        },
+      });
+
+      const reviewSum = await db.Review.sum("star", {
+        where: {
+          movieId: movieId,
+        },
+      });
+
+      const averageStar = reviewSum / reviewCount;
+
+      const updateMovieStar = await db.Movie.findByPk(movieId);
+      updateMovieStar.update({
+        averageRating: averageStar,
+      });
+
       if (!review) {
         return {
           statusCode: 1,
@@ -68,6 +121,9 @@ class ReviewServices {
       return {
         statusCode: 0,
         message: "Sửa đánh giá thành công",
+        averageStar,
+        reviewSum,
+        reviewCount,
       };
     } catch (error) {
       return {
@@ -87,13 +143,50 @@ class ReviewServices {
         };
       }
 
+      const reviewDoc = await db.Review.findOne({
+        where: { id: id },
+        include: [
+          {
+            model: db.Movie,
+          },
+        ],
+      });
+
+      const movieId = reviewDoc.Movie.id;
+
       await db.Review.destroy({
         where: { id: id },
+      });
+
+      const { count: reviewCount } = await db.Review.findAndCountAll({
+        where: {
+          movieId: movieId,
+        },
+      });
+
+      const reviewSum = await db.Review.sum("star", {
+        where: {
+          movieId: movieId,
+        },
+      });
+
+      let averageStar;
+
+      if (reviewCount == 0) {
+        averageStar = 0;
+      } else {
+        averageStar = reviewSum / reviewCount;
+      }
+
+      const updateMovieStar = await db.Movie.findByPk(movieId);
+      updateMovieStar.update({
+        averageRating: averageStar,
       });
 
       return {
         statusCode: 0,
         message: "Xoá đánh giá thành công",
+        averageStar,
       };
     } catch (error) {
       return {
@@ -203,6 +296,14 @@ class ReviewServices {
     try {
       const reviewDoc = await db.Review.findAll({
         order: [["updatedAt", "DESC"]],
+        include: [
+          {
+            model: db.User,
+          },
+          {
+            model: db.Movie,
+          },
+        ],
       });
 
       return {

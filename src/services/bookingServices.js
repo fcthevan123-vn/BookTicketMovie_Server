@@ -4,6 +4,7 @@ import {
   sendTicketBooked,
 } from "../middleWares/nodeMailer";
 import discountServices from "./discountServices";
+import notificationServices from "./notificationServices";
 import seatStatusServices from "./seatStatusServices";
 // eslint-disable-next-line no-undef
 const { Op } = require("sequelize");
@@ -406,6 +407,11 @@ class BookingServices {
           await seatStatusServices.deleteSeatStatus(seatStatus.id);
         }
 
+        await db.Movie.decrement(
+          { countBooked: 1 },
+          { where: { id: infoBooking.Show.Movie.id } }
+        );
+
         if (booking.discountId) {
           const increaseDiscount =
             await discountServices.increaseDiscountQuantity(booking.discountId);
@@ -419,11 +425,65 @@ class BookingServices {
         }
       }
 
+      const bookingDoc = await db.Booking.findOne({
+        where: {
+          id: bookingId,
+        },
+        include: [
+          {
+            model: db.Show,
+            include: [
+              {
+                model: db.MovieHall,
+                include: [
+                  {
+                    model: db.Cinema,
+                  },
+                ],
+              },
+              {
+                model: db.Movie,
+              },
+            ],
+          },
+          {
+            model: db.User,
+          },
+        ],
+      });
+
       if (status == "Đã thanh toán") {
         await booking.update({ staffId, status, isPaid: true });
+
+        await notificationServices.createNotification({
+          userId: bookingDoc.Show.MovieHall.Cinema.userId,
+          title: `${bookingDoc.User.fullName} - Đặt vé thành công`,
+          message: `Khách hàng ${bookingDoc.User.fullName} -  ${bookingDoc.User.phone} đã đặt vé phim ${bookingDoc.Show.Movie.title} thành công`,
+          linkNotification: `/employee/manage-booking`,
+          typeNotification: "default",
+        });
       } else {
         if (staffId) {
           await booking.update({ staffId, status });
+
+          const staffDoc = await db.User.findOne({
+            where: {
+              id: staffId,
+            },
+            include: [
+              {
+                model: db.Cinema,
+              },
+            ],
+          });
+
+          await notificationServices.createNotification({
+            userId: bookingDoc.userId,
+            title: `Đã nhận vé`,
+            message: `Nhân viên ${staffDoc.fullName} -  ${staffDoc.Cinema.name} đã xác nhận rằng bạn đã nhận vé. Chúc bạn xem phim vui vẻ.`,
+            linkNotification: `user/${bookingDoc.userId}/all-tickets`,
+            typeNotification: "default",
+          });
         } else {
           await booking.update({ staffId: null, status });
         }

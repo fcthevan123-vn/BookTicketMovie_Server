@@ -30,6 +30,7 @@ class BookingController {
         discount,
         status
       );
+
       if (response.statusCode === 0) {
         return res.status(200).json(response);
       }

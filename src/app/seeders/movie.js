@@ -24,6 +24,7 @@ module.exports = {
           language: "Anh",
           country: "Anh",
           subtitle: "Việt Nam",
+          averageRating: 0,
           releaseDate: "2024-04-18",
           endDate: "2024-05-31",
           images: [
@@ -53,6 +54,7 @@ module.exports = {
           country: "Trung Quốc",
           subtitle: "Việt Nam",
           releaseDate: "2024-04-17",
+          averageRating: 0,
           endDate: "2024-05-08",
           images: [
             "https://show-booking.s3.amazonaws.com/1a0fba89177a0a7332cd",
@@ -82,6 +84,7 @@ module.exports = {
           subtitle: "Việt Nam",
           releaseDate: "2024-04-16",
           endDate: "2024-05-07",
+          averageRating: 0,
           images: [
             "https://show-booking.s3.amazonaws.com/656bf0a38b6138bd8eb1",
             "https://show-booking.s3.amazonaws.com/cc2944a845798a724e02",
@@ -108,6 +111,7 @@ module.exports = {
           country: "Hàn Quốc",
           subtitle: "Việt Nam",
           releaseDate: "2024-04-15",
+          averageRating: 0,
           endDate: "2024-06-19",
           images: [
             "https://show-booking.s3.amazonaws.com/4e17cc22224e8a8639b4",
@@ -127,6 +131,7 @@ module.exports = {
         {
           id: "1ce2c985-20d1-40a8-bfbb-34e5fa90d18e",
           discountId: null,
+          averageRating: 0,
           title: "VÂY HÃM: KẺ TRỪNG PHẠT",
           description:
             "Siêu cớm Ma Seok-do tái xuất để đối đầu với những tội phạm tinh vi trong giới công nghệ. Nắm đấm trứ danh liệu có phát huy được sức mạnh trước liên minh tội phạm của thiên tài công nghệ và ông trùm nhà cái lớn nhất châu Á?",
@@ -155,6 +160,7 @@ module.exports = {
         {
           id: "a4dda645-f9cd-487c-a774-5b26dfcb022c",
           discountId: null,
+          averageRating: 0,
           title: "ANH HÙNG BÀN PHÍM",
           description:
             "Im Sang-jin - một phóng viên mảng xã hội đã bị đình chỉ công tác sau bài phóng sự điều tra sai lệch về những lùm xùm của tập đoàn Manjun. Tưởng rằng phải chịu nỗi oan ức suốt đời, Im Sang-jin bất ngờ nhận được thông tin ẩn danh khẳng định anh không sai, mà mọi thứ đã bị thao túng bởi một “đội quân” trực tuyến: Chỉ cần có tiền, sự thật nào cũng hoá thành dối lừa, còn tin tức giả lại hoá thành sự thật.",
@@ -180,6 +186,7 @@ module.exports = {
         },
         {
           id: "965cf9ac-6224-42ac-abe2-ee427ad0e6d1",
+          averageRating: 0,
           discountId: null,
           title: "CÁI GIÁ CỦA HẠNH PHÚC",
           description:
@@ -215,6 +222,7 @@ module.exports = {
         {
           id: "41f6b319-04b6-4e69-afac-c61a74ba3507",
           discountId: null,
+          averageRating: 0,
           title: "MÙA HÈ CỦA LUCA",
           description:
             '"Mùa Hè Của Luca" kể về chuyến hành trình của cậu bé Luca tại hòn đảo Portorosso thuộc vùng biển Địa Trung Hải ở Ý tuyệt đẹp. Ở đây cậu đã làm quen và kết thân với những người bạn nhỏ mới và tận hưởng mùa hè đầy nắng, kem Gelato và cả món mì Ý trứ danh. Tuy nhiên có một điều không ổn lắm, Luca là một THỦY QUÁI và những người dân trên hòn đảo này lại không thích điều này chút nào.',

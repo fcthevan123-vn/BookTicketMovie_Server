@@ -13,3 +13,4 @@ export { default as PaymentController } from "./PaymentController";
 export { default as EventController } from "./EventController";
 export { default as DiscountController } from "./DiscountController";
 export { default as FoodController } from "./FoodController";
+export { default as NotificationController } from "./NotificationController";

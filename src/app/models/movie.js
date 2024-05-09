@@ -39,6 +39,10 @@ module.exports = (sequelize, DataTypes) => {
       subtitle: DataTypes.STRING,
       releaseDate: DataTypes.DATEONLY,
       endDate: DataTypes.DATEONLY,
+      averageRating: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+      },
       images: DataTypes.ARRAY(DataTypes.STRING),
       genre: DataTypes.ARRAY(DataTypes.STRING),
       duration: DataTypes.INTEGER,

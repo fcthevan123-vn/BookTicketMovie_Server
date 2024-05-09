@@ -1,6 +1,6 @@
 import { validationResult } from "express-validator";
 import moment from "moment";
-import { bookingServices } from "../../services";
+import { bookingServices, notificationServices } from "../../services";
 import { sendEmailAfterUpdateTicketStatus } from "../../middleWares/nodeMailer";
 import db from "../models";
 
@@ -157,7 +157,7 @@ class PaymentController {
     vnp_Params["vnp_TxnRef"] = idTransaction;
     vnp_Params["vnp_OrderInfo"] = "Thanh toan cho ma GD:" + idTransaction;
     vnp_Params["vnp_OrderType"] = "Thanh toan VNPAY";
-    vnp_Params["vnp_Amount"] = totalPrice;
+    vnp_Params["vnp_Amount"] = totalPrice * 100;
     vnp_Params["vnp_ReturnUrl"] = returnUrl;
     vnp_Params["vnp_IpAddr"] = ipAddr;
     vnp_Params["vnp_CreateDate"] = createDate;
@@ -228,6 +228,15 @@ class PaymentController {
           return res.status(401).json(cancelBooking);
         }
 
+        await notificationServices.createNotification({
+          userId: getBookingInfo.data.userId,
+          title: "Huỷ vé",
+          message:
+            "Có vẻ như bạn đã huỷ thanh toán hoặc thanh toán không thành công, chúng tôi xin lỗi vì sự bất tiện này. Nếu muốn bán hoàn toàn có thể đặt lại vé.",
+          linkNotification: `/user/${getBookingInfo.data.userId}/all-tickets`,
+          typeNotification: "error",
+        });
+
         return res.status(200).json({
           statusCode: 1,
           message: "Thanh toán thất bại, vui lòng thanh toán lại",
@@ -239,6 +248,16 @@ class PaymentController {
         null,
         "Đã thanh toán"
       );
+
+      await notificationServices.createNotification({
+        userId: getBookingInfo.data.userId,
+        title: "Đặt vé thành công",
+        message:
+          "Chúc mừng bạn đã đặt vé thành công, chúng tôi hy vọng bạn có những trải nghiệm tuyệt vời tại hệ thống.",
+        linkNotification: `/user/${getBookingInfo.data.userId}/all-tickets`,
+        typeNotification: "default",
+      });
+
       if (confirmBooking.statusCode != 0) {
         return res.status(401).json(confirmBooking);
       }
@@ -258,11 +277,23 @@ class PaymentController {
         data: getBookingInfo.data,
       });
     } else {
+      const getBookingInfo = await bookingServices.getBookingById(bookingId);
+
       const cancelBooking = await bookingServices.updateBookingByStaff(
         bookingId,
         null,
         "Đã huỷ"
       );
+
+      await notificationServices.createNotification({
+        userId: getBookingInfo.data.userId,
+        title: "Huỷ vé",
+        message:
+          "Có vẻ như bạn đã huỷ thanh toán hoặc thanh toán không thành công, chúng tôi xin lỗi vì sự bất tiện này. Nếu muốn bán hoàn toàn có thể đặt lại vé.",
+        linkNotification: `/user/${getBookingInfo.data.userId}/all-tickets`,
+        typeNotification: "error",
+      });
+
       if (cancelBooking.statusCode != 0) {
         return res.status(401).json(cancelBooking);
       }

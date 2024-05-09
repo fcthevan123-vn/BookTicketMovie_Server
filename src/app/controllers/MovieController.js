@@ -283,7 +283,7 @@ class MovieController {
 
   async handleGetTrendingMovie(req, res) {
     try {
-      const response = await movieServices.getTrendingMovie();
+      const response = await movieServices.getActiveMovies();
       if (response.statusCode === 0) {
         return res.status(200).json(response);
       } else {

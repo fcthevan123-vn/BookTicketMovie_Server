@@ -2,6 +2,7 @@ import { Op } from "sequelize";
 import db from "../app/models";
 import showServices from "./showServices";
 import { S3Controller } from "../app/controllers";
+import { searchLikeDeep } from "../middleWares";
 
 async function checkValidNameCinema(name, location) {
   try {
@@ -537,6 +538,63 @@ class CinemaServices {
         message: "Đã có lỗi xảy ra khi getCinemaByStaff",
         error: error.message,
         staffId: staffId,
+      };
+    }
+  }
+
+  async filterCinema({ cinema, city, district }) {
+    try {
+      let queryCondition = {};
+
+      if (cinema && cinema.length > 0) {
+        queryCondition = {
+          name: searchLikeDeep("Cinema", "name", cinema),
+        };
+      }
+
+      if (city) {
+        queryCondition = {
+          ...queryCondition,
+          location: {
+            [Op.contains]: [city],
+          },
+        };
+      }
+
+      if (district) {
+        queryCondition = {
+          ...queryCondition,
+          location: {
+            [Op.contains]: [city, district],
+          },
+        };
+      }
+
+      const cinemaDoc = await db.Cinema.findAll({
+        where: queryCondition,
+        include: [
+          {
+            model: db.User,
+          },
+          {
+            model: db.MovieHall,
+          },
+        ],
+      });
+
+      return {
+        statusCode: 0,
+        message: "Không tìm thấy dữ liệu",
+        cinema,
+        city,
+        district,
+        cinemaDoc,
+      };
+    } catch (error) {
+      return {
+        statusCode: -1,
+        message: "Đã có lỗi xảy ra khi filterCinema",
+        error: error.message,
       };
     }
   }
