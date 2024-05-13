@@ -262,6 +262,9 @@ class CinemaServices {
                       },
                     },
                   },
+                  {
+                    model: db.RoomType,
+                  },
                 ],
               },
             ],
@@ -288,6 +291,9 @@ class CinemaServices {
                         [Op.eq]: selectedDate,
                       },
                     },
+                  },
+                  {
+                    model: db.RoomType,
                   },
                 ],
               },
@@ -325,6 +331,11 @@ class CinemaServices {
             include: [
               {
                 model: db.MovieHall,
+                include: [
+                  {
+                    model: db.RoomType,
+                  },
+                ],
               },
             ],
           });

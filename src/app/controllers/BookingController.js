@@ -182,6 +182,8 @@ class BookingController {
     try {
       const { id } = req.params;
 
+      const { date, timeType } = req.query;
+
       if (!id) {
         return res.status(401).json({
           statusCode: 1,
@@ -189,7 +191,11 @@ class BookingController {
         });
       }
 
-      const response = await bookingServices.statisticUserBooking(id);
+      const response = await bookingServices.statisticUserBooking(
+        id,
+        date,
+        timeType
+      );
       if (response.statusCode === 0) {
         return res.status(200).json(response);
       }

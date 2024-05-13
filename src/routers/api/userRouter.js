@@ -95,5 +95,6 @@ router.get(
 router.get("/statistic-by-day", UserController.handleStatisticByDay);
 
 router.get("/statistic-cinema", UserController.handleStatisticCinema);
+router.get("/suggest-movie", UserController.handleSuggestMovie);
 
 export default router;

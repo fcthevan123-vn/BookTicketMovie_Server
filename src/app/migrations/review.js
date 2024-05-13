@@ -13,7 +13,7 @@ module.exports = {
         type: Sequelize.STRING,
       },
       star: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.FLOAT,
       },
       userId: {
         allowNull: false,

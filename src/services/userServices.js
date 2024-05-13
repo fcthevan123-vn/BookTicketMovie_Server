@@ -1,9 +1,12 @@
 import moment from "moment";
-import db, { Sequelize } from "../app/models";
+import db from "../app/models";
 import bcrypt from "bcrypt";
 // eslint-disable-next-line no-undef
-const { Op, where } = require("sequelize");
+const { Op } = require("sequelize");
+import "moment/locale/vi";
 
+moment.locale("vi");
+// moment.locale("vi");
 const saltRounds = 10;
 const salt = bcrypt.genSaltSync(saltRounds);
 
@@ -526,7 +529,13 @@ class UserServices {
     }
   }
 
-  async statisticBookingAndCount({ cinemaId, movieHallId, movieId, timeType }) {
+  async statisticBookingAndCount({
+    cinemaId,
+    movieHallId,
+    movieId,
+    timeType,
+    date,
+  }) {
     try {
       let queryCinema = {};
 
@@ -588,7 +597,12 @@ class UserServices {
 
       const showIds = showDoc.map((item) => item.id);
 
-      const currentDate = moment().toDate();
+      // const test = moment
+
+      const currentDate = moment(date).toDate();
+      // console.log("date", date);
+      // console.log("currentDate", currentDate);
+      // console.log("currentDateFormat", moment(currentDate).format("DD/MM"));
 
       const listDays = [currentDate];
 
@@ -647,6 +661,7 @@ class UserServices {
 
         bookingStatistic.push({
           date: moment(dateFormatted).format("DD/MM/YY"),
+          // date: moment(dateFormatted).tz("Asia/Ho_Chi_Minh").format("DD/MM/YY"),
           "Doanh thu": bookingSum ? bookingSum : 0,
         });
 
@@ -663,9 +678,9 @@ class UserServices {
 
       const totalSum = await db.Booking.sum("totalPrice", {
         where: {
-          showId: {
-            [Op.in]: showIds,
-          },
+          // showId: {
+          //   [Op.in]: showIds,
+          // },
           isPaid: true,
         },
       });
@@ -979,6 +994,89 @@ class UserServices {
       return {
         statusCode: -1,
         message: "Có lỗi xảy ra tại statisticEmployee",
+        error: error.message,
+      };
+    }
+  }
+
+  async suggestMovie(userId) {
+    try {
+      const bookingDoc = await db.Booking.findAll({
+        where: {
+          userId: userId,
+        },
+        include: [
+          {
+            model: db.Show,
+            include: [
+              {
+                model: db.Movie,
+              },
+            ],
+          },
+        ],
+      });
+
+      let allMovies = [];
+
+      let allMoviesIds = [];
+
+      if (bookingDoc) {
+        allMovies = bookingDoc.map((booking) => booking.Show.Movie);
+        const filterId = bookingDoc.map((booking) => booking.Show.Movie.id);
+
+        // remove all ids duplicated use ES6
+        allMoviesIds = [...new Set(filterId)];
+      }
+
+      let allGenres = [];
+      let removeDuplicatesGenre = [];
+
+      if (allMovies.length > 0) {
+        for (let i = 0; i < allMovies.length; i++) {
+          for (let j = 0; j < allMovies[i].genre.length; j++) {
+            allGenres.push(allMovies[i].genre[j]);
+          }
+        }
+        // remove all genres duplicated use ES6
+        removeDuplicatesGenre = [...new Set(allGenres)];
+      }
+
+      let finalMovie = [];
+
+      if (removeDuplicatesGenre.length > 0) {
+        finalMovie = await db.Movie.findAll({
+          where: {
+            genre: {
+              [Op.contained]: removeDuplicatesGenre,
+            },
+            id: { [Op.notIn]: allMoviesIds },
+          },
+          limit: 1,
+        });
+      }
+
+      if (finalMovie.length == 0) {
+        finalMovie = await db.Movie.findAll({
+          where: {
+            genre: {
+              [Op.contains]: removeDuplicatesGenre,
+            },
+            id: { [Op.notIn]: allMoviesIds },
+          },
+          limit: 1,
+        });
+      }
+
+      return {
+        statusCode: 0,
+        message: "Thanh cong",
+        data: finalMovie,
+      };
+    } catch (error) {
+      return {
+        statusCode: -1,
+        message: "Có lỗi xảy ra tại suggestMovie",
         error: error.message,
       };
     }

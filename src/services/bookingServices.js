@@ -1,3 +1,4 @@
+import moment from "moment";
 import db from "../app/models";
 import {
   sendEmailAfterUpdateTicketStatus,
@@ -733,57 +734,103 @@ class BookingServices {
     }
   }
 
-  async statisticUserBooking(userId) {
+  async statisticUserBooking(userId, date, timeType) {
     try {
-      let stats = [];
+      const currentDate = moment(date).toDate();
 
-      const months = getLastSixMonths();
+      const listDays = [currentDate];
 
-      for (const month of months) {
-        const successBooking = await db.Booking.count({
-          where: {
-            userId,
-            status: "Đã thanh toán",
-            createdAt: {
-              [Op.between]: [month.start, month.end],
-            },
-          },
-        });
+      for (let i = 1; i <= 4; i++) {
+        const dateFormat = moment(currentDate).subtract(i, timeType).toDate();
 
-        const pendingBooking = await db.Booking.count({
-          where: {
-            userId,
-            status: {
-              [Op.or]: ["Chờ xác nhận", "Đã xác nhận"],
-            },
-            createdAt: {
-              [Op.between]: [month.start, month.end],
-            },
-          },
-        });
+        listDays.unshift(dateFormat);
+      }
 
-        const cancelBooking = await db.Booking.count({
+      const bookingStatistic = [];
+      const countBookingStatistic = [];
+
+      for (const dateFormatted of listDays) {
+        const endDate = moment(dateFormatted)
+          .add(1, timeType)
+          .subtract(1, "days")
+          .toDate();
+
+        const bookingSum = await db.Booking.sum("totalPrice", {
           where: {
             userId: userId,
-            status: "Đã huỷ",
-            createdAt: {
-              [Op.between]: [month.start, month.end],
+            isPaid: true,
+            date: {
+              [Op.between]: [dateFormatted, endDate],
             },
           },
         });
 
-        stats.push({
-          month: month.monthLabel,
-          successBooking,
-          pendingBooking,
-          cancelBooking,
+        const { count: countBookingSuccess } = await db.Booking.findAndCountAll(
+          {
+            where: {
+              userId: userId,
+              isPaid: true,
+              date: {
+                [Op.between]: [dateFormatted, endDate],
+              },
+            },
+          }
+        );
+
+        const { count: countBookingFail } = await db.Booking.findAndCountAll({
+          where: {
+            userId: userId,
+            isPaid: false,
+            date: {
+              [Op.between]: [dateFormatted, endDate],
+            },
+          },
+        });
+
+        bookingStatistic.push({
+          date: moment(dateFormatted).format("DD/MM/YY"),
+          // date: moment(dateFormatted).tz("Asia/Ho_Chi_Minh").format("DD/MM/YY"),
+          "Tiền đã chi": bookingSum ? bookingSum : 0,
+        });
+
+        countBookingStatistic.push({
+          date: moment(dateFormatted).format("DD/MM/YY"),
+          "Vé thành công": countBookingSuccess,
+          "Vé bị huỷ": countBookingFail,
         });
       }
+
+      const { count: totalReview } = await db.Review.findAndCountAll({
+        where: {
+          userId: userId,
+        },
+      });
+
+      const { count: totalBooking } = await db.Booking.findAndCountAll({
+        where: {
+          userId: userId,
+          isPaid: true,
+        },
+      });
+
+      const totalPrice = await db.Booking.sum("totalPrice", {
+        where: {
+          userId: userId,
+          isPaid: true,
+        },
+      });
 
       return {
         statusCode: 0,
         message: "Thành công",
-        data: stats.reverse(),
+        // data: stats.reverse(),
+        data: {
+          bookingStatistic,
+          countBookingStatistic,
+          totalReview,
+          totalPrice,
+          totalBooking,
+        },
       };
     } catch (error) {
       console.log(error);

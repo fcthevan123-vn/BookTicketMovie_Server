@@ -597,9 +597,13 @@ class movieServices {
 
       const currentDate = new Date();
 
+      console.log("status", status);
       if (status == "Phim đang chiếu") {
         whereCondition.releaseDate = {
           [Op.lte]: currentDate,
+        };
+        whereCondition.endDate = {
+          [Op.gte]: currentDate,
         };
       } else if (status == "Phim sắp chiếu") {
         whereCondition.releaseDate = {

@@ -161,6 +161,7 @@ class SeatServices {
       const checkName = await db.SeatType.findOne({
         where: {
           name: name,
+          cinemaId: cinemaDoc.data.id,
         },
       });
 
@@ -186,6 +187,7 @@ class SeatServices {
     } catch (error) {
       return {
         statusCode: -1,
+        error: error.message,
         message: "Lỗi trong quá trình creatSeatType",
       };
     }

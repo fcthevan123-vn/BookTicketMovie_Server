@@ -285,13 +285,15 @@ class UserController {
   }
 
   async handleStatisticBooking(req, res) {
-    const { cinemaId, movieHallId, movieId, timeType } = req.query;
+    const { cinemaId, movieHallId, movieId, timeType, date } = req.query;
+
     try {
       const response = await userServices.statisticBookingAndCount({
         cinemaId,
         movieHallId,
         movieId,
         timeType,
+        date,
       });
       if (response.statusCode === 0) {
         return res.status(200).json(response);
@@ -337,6 +339,23 @@ class UserController {
       console.log(error);
       return res.status(500).json({
         message: "Error handleStatisticBooking",
+        err: error.message,
+      });
+    }
+  }
+
+  async handleSuggestMovie(req, res) {
+    const { userId } = req.query;
+    try {
+      const response = await userServices.suggestMovie(userId);
+      if (response.statusCode === 0) {
+        return res.status(200).json(response);
+      }
+      return res.status(400).json(response);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        message: "Error handleSuggestMovie",
         err: error.message,
       });
     }
